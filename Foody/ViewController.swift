@@ -11,6 +11,8 @@ import CoreLocation
 
 class ViewController: UIViewController {
 
+    let client_Id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
+    let client_Secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
     let locationManager = CLLocationManager()
 
     override func viewDidLoad() {
@@ -31,7 +33,9 @@ extension ViewController: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let newLocation = locations.last
-        print(newLocation?.coordinate.latitude as Any)
+        print(newLocation?.coordinate.latitude)
+        print(newLocation?.coordinate.longitude)
+        newLocation?.horizontalAccuracy
     }
 
 }
