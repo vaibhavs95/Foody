@@ -13,6 +13,7 @@
 		22D2185320AF136F00D15DFB /* Foody.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 22D2185120AF136F00D15DFB /* Foody.xcdatamodeld */; };
 		22D2185520AF136F00D15DFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22D2185420AF136F00D15DFB /* Assets.xcassets */; };
 		22D2185820AF136F00D15DFB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D2185620AF136F00D15DFB /* LaunchScreen.storyboard */; };
+		22D2186020AF5A0400D15DFB /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2185F20AF5A0400D15DFB /* DataModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		22D2185420AF136F00D15DFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		22D2185720AF136F00D15DFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		22D2185920AF136F00D15DFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22D2185F20AF5A0400D15DFB /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 			children = (
 				22D2184A20AF136F00D15DFB /* AppDelegate.swift */,
 				22D2184C20AF136F00D15DFB /* ViewController.swift */,
+				22D2185F20AF5A0400D15DFB /* DataModels.swift */,
 				22D2184E20AF136F00D15DFB /* Main.storyboard */,
 				22D2185420AF136F00D15DFB /* Assets.xcassets */,
 				22D2185620AF136F00D15DFB /* LaunchScreen.storyboard */,
@@ -140,6 +143,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22D2185320AF136F00D15DFB /* Foody.xcdatamodeld in Sources */,
+				22D2186020AF5A0400D15DFB /* DataModels.swift in Sources */,
 				22D2184D20AF136F00D15DFB /* ViewController.swift in Sources */,
 				22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */,
 			);
