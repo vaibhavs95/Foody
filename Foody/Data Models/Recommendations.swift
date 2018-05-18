@@ -1,5 +1,5 @@
 //
-//  DataModels.swift
+//  Recommendations.swift
 //  Foody
 //
 //  Created by Vaibhav Singh on 19/05/18.
@@ -7,38 +7,6 @@
 //
 
 import Foundation
-
-struct FoursquareResponse<T>: Codable where T: Codable {
-
-    var meta: MetaData?
-    var response: T?
-
-    enum CodingKeys: String, CodingKey {
-
-        case meta
-        case response
-    }
-}
-
-struct MetaData: Codable {
-
-    var code: Int?
-    var requestId: String?
-
-    enum CodingKeys: String, CodingKey {
-        case code
-        case requestId
-    }
-}
-
-struct Warning: Codable {
-
-    var text: String?
-
-    enum CodingKeys: String, CodingKey {
-        case text
-    }
-}
 
 struct Response: Codable {
 
@@ -129,6 +97,8 @@ struct Location: Codable {
     var city:  String?
     var state: String?
     var country: String?
+    var lattitude: Double?
+    var longitude: Double?
     var formattedAddress: [String]?
 
     enum CodingKeys: String, CodingKey {
@@ -140,6 +110,8 @@ struct Location: Codable {
         case city
         case state
         case country
+        case lattitude = "lat"
+        case longitude = "lng"
         case formattedAddress
     }
 }
@@ -161,6 +133,14 @@ struct Icon: Codable {
 
     var prefix: String?
     var suffix: String?
+
+    var url: URL? {
+        if let pre = prefix, let suf = suffix {
+
+            return URL(string: pre)?.appendingPathComponent(suf)
+        }
+        return nil
+    }
 
     enum CodingKeys: String, CodingKey {
         case prefix
