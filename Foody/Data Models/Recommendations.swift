@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Response: Codable {
+struct RecommendedResponse: Codable {
 
     var warning: Warning?
     var location: String?

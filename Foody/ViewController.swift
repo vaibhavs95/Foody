@@ -28,6 +28,8 @@ class ViewController: UIViewController {
     func snapToPlace(location: CLLocationCoordinate2D) {
         let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=25&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
 
+//         let endPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
+
         if let url = URL(string: endPoint) {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
@@ -38,7 +40,7 @@ class ViewController: UIViewController {
                 if error != nil {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
-                    let result = self.decodeResponse(data: data, type: Response.self)
+                    let result = self.decodeResponse(data: data, type: SearchResponse.self)
                     print(result as Any)
                 }
             })
@@ -67,10 +69,10 @@ extension ViewController: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -10, newLocation.horizontalAccuracy < 100 {
+        if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -30, newLocation.horizontalAccuracy <= 100 {
 
             // Invalidate the Location Manager for further updates
-            locationManager.startUpdatingLocation()
+            locationManager.stopUpdatingLocation()
             locationManager.delegate = nil
 
             print(newLocation.coordinate.latitude)

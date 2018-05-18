@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2265BCAB20AF6F2A00709490 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2265BCAA20AF6F2A00709490 /* Search.swift */; };
 		22995D6820AF6BD2008777D3 /* Recommendations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22995D6720AF6BD2008777D3 /* Recommendations.swift */; };
 		22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184A20AF136F00D15DFB /* AppDelegate.swift */; };
 		22D2184D20AF136F00D15DFB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184C20AF136F00D15DFB /* ViewController.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2265BCAA20AF6F2A00709490 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		22995D6720AF6BD2008777D3 /* Recommendations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recommendations.swift; sourceTree = "<group>"; };
 		22D2184720AF136F00D15DFB /* Foody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Foody.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22D2184A20AF136F00D15DFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -46,6 +48,7 @@
 			children = (
 				22D2185F20AF5A0400D15DFB /* Response.swift */,
 				22995D6720AF6BD2008777D3 /* Recommendations.swift */,
+				2265BCAA20AF6F2A00709490 /* Search.swift */,
 			);
 			path = "Data Models";
 			sourceTree = "<group>";
@@ -156,6 +159,7 @@
 				22D2185320AF136F00D15DFB /* Foody.xcdatamodeld in Sources */,
 				22D2186020AF5A0400D15DFB /* Response.swift in Sources */,
 				22D2184D20AF136F00D15DFB /* ViewController.swift in Sources */,
+				2265BCAB20AF6F2A00709490 /* Search.swift in Sources */,
 				22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */,
 				22995D6820AF6BD2008777D3 /* Recommendations.swift in Sources */,
 			);
