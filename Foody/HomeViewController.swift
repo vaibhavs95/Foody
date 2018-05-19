@@ -16,8 +16,18 @@ let foursquare_version = "20180519"
 
 class HomeViewController: UIViewController {
 
+    @IBOutlet weak var tableview: UITableView! {
+        didSet {
+            tableview.dataSource = self
+            tableview.delegate = self
+            tableview.rowHeight = UITableViewAutomaticDimension
+            tableview.register(UINib(nibName: String(describing: VenueTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: VenueTableViewCell.self))
+        }
+    }
+
     let locationManager = CLLocationManager()
     var storedVenues: [ManagedVenue] = []
+    var recommendations: RecommendedResponse?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,6 +85,10 @@ class HomeViewController: UIViewController {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
                     let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
+                    self.recommendations = result
+                    DispatchQueue.main.async {
+                        self.tableview.reloadData()
+                    }
                     print(result as Any)
                 }
             })
@@ -120,6 +134,27 @@ class HomeViewController: UIViewController {
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
+    }
+}
+
+extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return recommendations?.groups?.first?.items?.count ?? 0
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: VenueTableViewCell.self), for: indexPath) as! VenueTableViewCell
+        if let itemForCell = recommendations?.groups?.first?.items?[indexPath.row] {
+            cell.configure(item: itemForCell)
+        }
+        cell.selectionStyle = .none
+
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
     }
 }
 
