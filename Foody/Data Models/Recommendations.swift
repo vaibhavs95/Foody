@@ -137,7 +137,7 @@ struct Icon: Codable {
     var url: URL? {
         if let pre = prefix, let suf = suffix {
 
-            return URL(string: pre)?.appendingPathComponent(suf)
+            return URL(string: "\(pre)88\(suf)")
         }
         return nil
     }
