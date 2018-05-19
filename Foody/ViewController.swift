@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreLocation
+import CoreData
 
 class ViewController: UIViewController {
 
@@ -15,6 +16,7 @@ class ViewController: UIViewController {
     let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
     let foursquare_version = "20180519"
     let locationManager = CLLocationManager()
+    var storedVenues: [NSManagedObject] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +25,15 @@ class ViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
+//        for name in ["Rahul", "Sahul", "Mahul"] {
+//            self.save(id: name)
+//        }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        fetch()
     }
 
     func snapToPlace(location: CLLocationCoordinate2D) {
@@ -59,6 +70,34 @@ class ViewController: UIViewController {
             print("Error while decoding -> \(error.localizedDescription)")
         }
         return nil
+    }
+
+    func save(id: String) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "ManagedVenue", in: managedContext)!
+        let person = NSManagedObject(entity: entity, insertInto: managedContext)
+        person.setValue(id, forKey: "id")
+
+        do {
+            try managedContext.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
+
+    func fetch() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<ManagedVenue>(entityName: "ManagedVenue")
+        do {
+            let savedVenues = try managedContext.fetch(fetchRequest)
+            print(savedVenues)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
     }
 }
 
