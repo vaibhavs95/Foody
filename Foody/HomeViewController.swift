@@ -24,10 +24,14 @@ class HomeViewController: UIViewController {
             tableview.register(UINib(nibName: String(describing: VenueTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: VenueTableViewCell.self))
         }
     }
+    private let context: NSManagedObjectContext? = {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
 
-    let locationManager = CLLocationManager()
-    var storedVenues: [ManagedVenue] = []
-    var venues: [Venue?] = []
+        return appDelegate.persistentContainer.viewContext
+    }()
+    private let locationManager = CLLocationManager()
+    private var dislikedVenues: [NSManagedObject] = []
+    private var venues: [Venue?] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +46,7 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        fetch()
+        fetchDislikes()
     }
 
     private func customizeNavBar() {
@@ -72,7 +76,7 @@ class HomeViewController: UIViewController {
     func snapToPlace(location: CLLocationCoordinate2D) {
         let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=25&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
 
-//         let endPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
+//         let searchEndPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
 
         if let url = URL(string: endPoint) {
             var request = URLRequest(url: url)
@@ -85,8 +89,11 @@ class HomeViewController: UIViewController {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
                     let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
-                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
-                    
+                    let unFilteredVenues = result?.groups?.first?.items?.map { return $0.venue } ?? []
+                    for disliked in self.dislikedVenues {
+                        self.venues = unFilteredVenues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
+                    }
+
                     DispatchQueue.main.async {
                         self.tableview.reloadData()
                     }
@@ -110,30 +117,30 @@ class HomeViewController: UIViewController {
         return nil
     }
 
-    func save(id: String) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-
-        let managedContext = appDelegate.persistentContainer.viewContext
+    func saveDisliked(_ id: String) {
+        guard let managedContext = context else { return }
         let entity = NSEntityDescription.entity(forEntityName: "ManagedVenue", in: managedContext)!
         let person = NSManagedObject(entity: entity, insertInto: managedContext)
         person.setValue(id, forKey: "id")
 
+        saveDBState(context: managedContext)
+    }
+
+    func fetchDislikes() {
+        guard let managedContext = context else { return }
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ManagedVenue")
         do {
-            try managedContext.save()
+            dislikedVenues = try managedContext.fetch(fetchRequest)
         } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
+            print("Could not fetch. \(error), \(error.userInfo)")
         }
     }
 
-    func fetch() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-
-        let managedContext = appDelegate.persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<ManagedVenue>(entityName: "ManagedVenue")
+    func saveDBState(context: NSManagedObjectContext) {
         do {
-            storedVenues = try managedContext.fetch(fetchRequest)
+            try context.save()
         } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
+            print("Could not save. \(error), \(error.userInfo)")
         }
     }
 }
@@ -161,13 +168,21 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-extension HomeViewController: VenueTableViewCellDelegate {
+extension HomeViewController: UISearchBarDelegate {
 
-    func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
-//        save(id: id)
-        if let index = venues.index(where: { $0?.id == id }) {
-            venues[index]?.isDisliked = disliked
-        }
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        // Todo: Call the seach API
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        UIView.animate(withDuration: 0.25, animations: {
+            searchBar.alpha = 0
+            searchBar.frame.origin.x = UIScreen.main.bounds.width
+        }, completion: { finished in
+            searchBar.resignFirstResponder()
+            self.navigationItem.titleView = nil
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(self.searchButtontapped(_:)))
+        })
     }
 }
 
@@ -178,12 +193,11 @@ extension HomeViewController: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -30 || newLocation.horizontalAccuracy <= 100 {
 
+        if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -30 || newLocation.horizontalAccuracy <= 100 {
             // Invalidate the Location Manager for further updates
             locationManager.stopUpdatingLocation()
             locationManager.delegate = nil
-
             print(newLocation.coordinate.latitude)
             print(newLocation.coordinate.longitude)
 
@@ -192,21 +206,26 @@ extension HomeViewController: CLLocationManagerDelegate {
     }
 }
 
-extension HomeViewController: UISearchBarDelegate {
+extension HomeViewController: VenueTableViewCellDelegate {
 
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // Todo: Call the seach API
-    }
+    func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
+        if let index = venues.index(where: { $0?.id == id }) {
+            //Save current state in Data Model
+            venues[index]?.isDisliked = disliked
+        }
 
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        if disliked {
+            //Save in the Database
+            saveDisliked(id)
 
-        UIView.animate(withDuration: 0.25, animations: {
-            searchBar.alpha = 0
-            searchBar.frame.origin.x = UIScreen.main.bounds.width
-        }, completion: { finished in
-            searchBar.resignFirstResponder()
-            self.navigationItem.titleView = nil
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(self.searchButtontapped(_:)))
-        })
+        } else if let managedContext = context {
+            //Remove from the database to display again if not disliked
+            fetchDislikes()
+            if let indexToDelete = dislikedVenues.index(where: { ($0.value(forKey: "id") as! String) == id }) {
+                managedContext.delete(dislikedVenues[indexToDelete])
+                dislikedVenues.remove(at: indexToDelete)
+                saveDBState(context: managedContext)
+            }
+        }
     }
 }
