@@ -146,9 +146,11 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: VenueTableViewCell.self), for: indexPath) as! VenueTableViewCell
-        if let itemForCell = recommendations?.groups?.first?.items?[indexPath.row] {
-            cell.configure(item: itemForCell)
-        }
+        guard let itemForCell = recommendations?.groups?.first?.items?[indexPath.row]
+
+            else { return cell }
+        cell.configure(item: itemForCell)
+        cell.delegate = self
         cell.selectionStyle = .none
 
         return cell
@@ -156,6 +158,16 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
+    }
+}
+
+extension HomeViewController: VenueTableViewCellDelegate {
+
+    func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
+//        save(id: id)
+        if let index = recommendations?.groups?.first?.items?.index(where: { $0.venue?.id == id }) {
+            recommendations?.groups?[0].items?[index].venue?.isDisliked = disliked
+        }
     }
 }
 
