@@ -34,10 +34,7 @@ class VenueTableViewCell: UITableViewCell {
         nameLabel.text = item.venue?.name
         distanceLabel.text = "\(item.venue?.location?.distance ?? 0) metres"
         categoryLabel.text = item.venue?.categories?.first?.name
-        if let reason = item.reasons?.items?.first.unsafelyUnwrapped?.summary {
-            categoryLabel.text?.append(", \(reason)")
-        }
-        addressLabel.text = item.venue?.location?.formattedAddress?.joined()
+        addressLabel.text = item.venue?.location?.formattedAddress?.joined(separator: ", ")
     }
     
     @IBAction func dislikeButtonTapped(_ sender: Any) {

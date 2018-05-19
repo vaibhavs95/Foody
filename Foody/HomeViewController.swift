@@ -86,6 +86,7 @@ class HomeViewController: UIViewController {
                 } else {
                     let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
                     self.recommendations = result
+                    
                     DispatchQueue.main.async {
                         self.tableview.reloadData()
                     }
