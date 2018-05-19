@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="145" id="KGk-i7-Jjw" customClass="VenueTableViewCell" customModule="Foody" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="468" height="145"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="468" height="144.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="02V-SD-1nb">
+                        <rect key="frame" x="20" y="21" width="100" height="100"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="02V-SD-1nb" secondAttribute="height" multiplier="1:1" id="5uN-58-oWY"/>
+                            <constraint firstAttribute="width" constant="100" id="h6G-Yj-E1q"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hYJ-RE-Oqd">
+                        <rect key="frame" x="135" y="21" width="303" height="24"/>
+                        <fontDescription key="fontDescription" type="system" weight="light" pointSize="20"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Distance" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u6w-Hd-oFV">
+                        <rect key="frame" x="135" y="50" width="223" height="20"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Category" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5a9-hW-sQE">
+                        <rect key="frame" x="135" y="74.5" width="303" height="19.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Address" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a2b-Wc-B3N">
+                        <rect key="frame" x="135" y="99" width="303" height="19.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0J8-f5-0nf">
+                        <rect key="frame" x="368" y="50" width="70" height="20"/>
+                        <color key="backgroundColor" red="0.89411764709999997" green="0.89411764709999997" blue="0.89411764709999997" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="70" id="Whz-SO-Mfr"/>
+                        </constraints>
+                        <state key="normal" title="Dislike">
+                            <color key="titleColor" red="0.7649309961928934" green="0.17471652065435861" blue="0.13474035195879844" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </state>
+                        <connections>
+                            <action selector="dislikeButtonTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="s2u-3e-yvQ"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="u6w-Hd-oFV" firstAttribute="top" secondItem="hYJ-RE-Oqd" secondAttribute="bottom" constant="5" id="2y6-kL-8g2"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="a2b-Wc-B3N" secondAttribute="trailing" constant="10" id="4Tu-RP-M2O"/>
+                    <constraint firstItem="0J8-f5-0nf" firstAttribute="centerY" secondItem="u6w-Hd-oFV" secondAttribute="centerY" id="8Sc-aA-M3D"/>
+                    <constraint firstItem="5a9-hW-sQE" firstAttribute="top" secondItem="u6w-Hd-oFV" secondAttribute="bottom" constant="5" id="ERa-ef-w6A"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="5a9-hW-sQE" secondAttribute="trailing" constant="10" id="JIA-5H-Ld5"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="hYJ-RE-Oqd" secondAttribute="trailing" constant="10" id="Mhh-sc-E4x"/>
+                    <constraint firstItem="a2b-Wc-B3N" firstAttribute="leading" secondItem="hYJ-RE-Oqd" secondAttribute="leading" id="SVs-DM-BTG"/>
+                    <constraint firstItem="02V-SD-1nb" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="THR-7B-SZP"/>
+                    <constraint firstItem="a2b-Wc-B3N" firstAttribute="top" secondItem="5a9-hW-sQE" secondAttribute="bottom" constant="5" id="bAs-qL-oXj"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="0J8-f5-0nf" secondAttribute="trailing" constant="10" id="bqD-jX-wj3"/>
+                    <constraint firstItem="0J8-f5-0nf" firstAttribute="height" secondItem="u6w-Hd-oFV" secondAttribute="height" id="fLg-eE-GSG"/>
+                    <constraint firstItem="u6w-Hd-oFV" firstAttribute="leading" secondItem="hYJ-RE-Oqd" secondAttribute="leading" id="fnU-Jq-ZCk"/>
+                    <constraint firstItem="5a9-hW-sQE" firstAttribute="leading" secondItem="hYJ-RE-Oqd" secondAttribute="leading" id="gza-Ma-a55"/>
+                    <constraint firstItem="hYJ-RE-Oqd" firstAttribute="leading" secondItem="02V-SD-1nb" secondAttribute="trailing" constant="15" id="kxT-XS-Lmd"/>
+                    <constraint firstItem="hYJ-RE-Oqd" firstAttribute="top" secondItem="02V-SD-1nb" secondAttribute="top" id="lQl-OW-rKV"/>
+                    <constraint firstItem="02V-SD-1nb" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="10" id="rAY-vL-MRV"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="a2b-Wc-B3N" secondAttribute="bottom" constant="15" id="t5q-ur-aoD"/>
+                    <constraint firstItem="0J8-f5-0nf" firstAttribute="leading" secondItem="u6w-Hd-oFV" secondAttribute="trailing" constant="10" id="wic-Sv-AWJ"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="addressLabel" destination="a2b-Wc-B3N" id="83P-Ea-BEl"/>
+                <outlet property="categoryLabel" destination="5a9-hW-sQE" id="pMp-6Q-6bo"/>
+                <outlet property="dislikeButton" destination="0J8-f5-0nf" id="Zac-XI-8BJ"/>
+                <outlet property="distanceLabel" destination="u6w-Hd-oFV" id="upZ-zH-rKT"/>
+                <outlet property="iconImageView" destination="02V-SD-1nb" id="ECN-yu-n1x"/>
+                <outlet property="nameLabel" destination="hYJ-RE-Oqd" id="ogm-uT-4gl"/>
+            </connections>
+            <point key="canvasLocation" x="108" y="104.5"/>
+        </tableViewCell>
+    </objects>
+</document>

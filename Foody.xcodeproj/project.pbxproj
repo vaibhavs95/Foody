@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2265BCAB20AF6F2A00709490 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2265BCAA20AF6F2A00709490 /* Search.swift */; };
 		2291402220B0AF2D00AA2718 /* DetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2291402120B0AF2D00AA2718 /* DetailsViewController.swift */; };
+		2291402520B0B2D600AA2718 /* VenueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */; };
+		2291402620B0B2D600AA2718 /* VenueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2291402420B0B2D600AA2718 /* VenueTableViewCell.xib */; };
 		22995D6820AF6BD2008777D3 /* Recommendations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22995D6720AF6BD2008777D3 /* Recommendations.swift */; };
 		22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184A20AF136F00D15DFB /* AppDelegate.swift */; };
 		22D2184D20AF136F00D15DFB /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184C20AF136F00D15DFB /* HomeViewController.swift */; };
@@ -22,6 +24,8 @@
 /* Begin PBXFileReference section */
 		2265BCAA20AF6F2A00709490 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		2291402120B0AF2D00AA2718 /* DetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewController.swift; sourceTree = "<group>"; };
+		2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueTableViewCell.swift; sourceTree = "<group>"; };
+		2291402420B0B2D600AA2718 /* VenueTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VenueTableViewCell.xib; sourceTree = "<group>"; };
 		22995D6720AF6BD2008777D3 /* Recommendations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recommendations.swift; sourceTree = "<group>"; };
 		22D2184720AF136F00D15DFB /* Foody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Foody.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22D2184A20AF136F00D15DFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -77,12 +81,14 @@
 				22D2184A20AF136F00D15DFB /* AppDelegate.swift */,
 				22D2184C20AF136F00D15DFB /* HomeViewController.swift */,
 				2291402120B0AF2D00AA2718 /* DetailsViewController.swift */,
-				22995D6620AF6BB3008777D3 /* Data Models */,
+				2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */,
+				2291402420B0B2D600AA2718 /* VenueTableViewCell.xib */,
 				22D2184E20AF136F00D15DFB /* Main.storyboard */,
 				22D2185420AF136F00D15DFB /* Assets.xcassets */,
 				22D2185620AF136F00D15DFB /* LaunchScreen.storyboard */,
 				22D2185920AF136F00D15DFB /* Info.plist */,
 				22D2185120AF136F00D15DFB /* Foody.xcdatamodeld */,
+				22995D6620AF6BB3008777D3 /* Data Models */,
 			);
 			path = Foody;
 			sourceTree = "<group>";
@@ -147,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22D2185820AF136F00D15DFB /* LaunchScreen.storyboard in Resources */,
+				2291402620B0B2D600AA2718 /* VenueTableViewCell.xib in Resources */,
 				22D2185520AF136F00D15DFB /* Assets.xcassets in Resources */,
 				22D2185020AF136F00D15DFB /* Main.storyboard in Resources */,
 			);
@@ -160,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22D2185320AF136F00D15DFB /* Foody.xcdatamodeld in Sources */,
+				2291402520B0B2D600AA2718 /* VenueTableViewCell.swift in Sources */,
 				22D2186020AF5A0400D15DFB /* Response.swift in Sources */,
 				22D2184D20AF136F00D15DFB /* HomeViewController.swift in Sources */,
 				2265BCAB20AF6F2A00709490 /* Search.swift in Sources */,
