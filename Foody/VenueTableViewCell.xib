@@ -29,7 +29,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hYJ-RE-Oqd">
-                        <rect key="frame" x="95" y="21" width="263" height="21.5"/>
+                        <rect key="frame" x="95" y="21" width="273" height="21.5"/>
                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="18"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -53,15 +53,13 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0J8-f5-0nf">
-                        <rect key="frame" x="368" y="21" width="70" height="30"/>
-                        <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <rect key="frame" x="378" y="21" width="60" height="25"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="30" id="lLB-c8-lSc"/>
-                            <constraint firstAttribute="width" constant="70" id="ssm-i9-8Fq"/>
+                            <constraint firstAttribute="height" constant="25" id="lLB-c8-lSc"/>
+                            <constraint firstAttribute="width" constant="60" id="ssm-i9-8Fq"/>
                         </constraints>
-                        <state key="normal" title="Dislike">
-                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        </state>
+                        <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
+                        <state key="normal" title="Dislike"/>
                         <connections>
                             <action selector="dislikeButtonTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="s2u-3e-yvQ"/>
                         </connections>

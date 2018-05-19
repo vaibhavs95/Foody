@@ -23,7 +23,10 @@ class VenueTableViewCell: UITableViewCell {
     }
     @IBOutlet weak var dislikeButton: UIButton! {
         didSet {
-            dislikeButton.layer.cornerRadius = 15
+            dislikeButton.layer.borderColor = UIColor(red: 0, green: 122/255, blue: 1, alpha: 1).cgColor
+            dislikeButton.layer.borderWidth = 1
+            dislikeButton.layer.cornerRadius = dislikeButton.bounds.height / 2
+            dislikeButton.clipsToBounds = true
         }
     }
 
