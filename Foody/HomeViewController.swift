@@ -14,7 +14,7 @@ let client_id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
 let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
 let foursquare_version = "20180519"
 
-class ViewController: UIViewController {
+class HomeViewController: UIViewController {
 
     let locationManager = CLLocationManager()
     var storedVenues: [ManagedVenue] = []
@@ -123,7 +123,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: CLLocationManagerDelegate {
+extension HomeViewController: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location Manager failed with error : \(error.localizedDescription)")
@@ -144,7 +144,7 @@ extension ViewController: CLLocationManagerDelegate {
     }
 }
 
-extension ViewController: UISearchBarDelegate {
+extension HomeViewController: UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // Todo: Call the seach API

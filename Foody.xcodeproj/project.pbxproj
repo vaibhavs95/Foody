@@ -8,9 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		2265BCAB20AF6F2A00709490 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2265BCAA20AF6F2A00709490 /* Search.swift */; };
+		2291402220B0AF2D00AA2718 /* DetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2291402120B0AF2D00AA2718 /* DetailsViewController.swift */; };
 		22995D6820AF6BD2008777D3 /* Recommendations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22995D6720AF6BD2008777D3 /* Recommendations.swift */; };
 		22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184A20AF136F00D15DFB /* AppDelegate.swift */; };
-		22D2184D20AF136F00D15DFB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184C20AF136F00D15DFB /* ViewController.swift */; };
+		22D2184D20AF136F00D15DFB /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D2184C20AF136F00D15DFB /* HomeViewController.swift */; };
 		22D2185020AF136F00D15DFB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D2184E20AF136F00D15DFB /* Main.storyboard */; };
 		22D2185320AF136F00D15DFB /* Foody.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 22D2185120AF136F00D15DFB /* Foody.xcdatamodeld */; };
 		22D2185520AF136F00D15DFB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22D2185420AF136F00D15DFB /* Assets.xcassets */; };
@@ -20,10 +21,11 @@
 
 /* Begin PBXFileReference section */
 		2265BCAA20AF6F2A00709490 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
+		2291402120B0AF2D00AA2718 /* DetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewController.swift; sourceTree = "<group>"; };
 		22995D6720AF6BD2008777D3 /* Recommendations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recommendations.swift; sourceTree = "<group>"; };
 		22D2184720AF136F00D15DFB /* Foody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Foody.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22D2184A20AF136F00D15DFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		22D2184C20AF136F00D15DFB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		22D2184C20AF136F00D15DFB /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		22D2184F20AF136F00D15DFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		22D2185220AF136F00D15DFB /* Foody.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Foody.xcdatamodel; sourceTree = "<group>"; };
 		22D2185420AF136F00D15DFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -73,7 +75,8 @@
 			isa = PBXGroup;
 			children = (
 				22D2184A20AF136F00D15DFB /* AppDelegate.swift */,
-				22D2184C20AF136F00D15DFB /* ViewController.swift */,
+				22D2184C20AF136F00D15DFB /* HomeViewController.swift */,
+				2291402120B0AF2D00AA2718 /* DetailsViewController.swift */,
 				22995D6620AF6BB3008777D3 /* Data Models */,
 				22D2184E20AF136F00D15DFB /* Main.storyboard */,
 				22D2185420AF136F00D15DFB /* Assets.xcassets */,
@@ -158,8 +161,9 @@
 			files = (
 				22D2185320AF136F00D15DFB /* Foody.xcdatamodeld in Sources */,
 				22D2186020AF5A0400D15DFB /* Response.swift in Sources */,
-				22D2184D20AF136F00D15DFB /* ViewController.swift in Sources */,
+				22D2184D20AF136F00D15DFB /* HomeViewController.swift in Sources */,
 				2265BCAB20AF6F2A00709490 /* Search.swift in Sources */,
+				2291402220B0AF2D00AA2718 /* DetailsViewController.swift in Sources */,
 				22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */,
 				22995D6820AF6BD2008777D3 /* Recommendations.swift in Sources */,
 			);
