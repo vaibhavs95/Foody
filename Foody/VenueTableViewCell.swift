@@ -45,19 +45,19 @@ class VenueTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
 
-    func configure(item: GroupItem) {
-        self.itemId = item.venue?.id ?? ""
-        nameLabel.text = item.venue?.name
-        distanceLabel.text = "\(item.venue?.location?.distance ?? 0) metres away"
-        categoryLabel.text = item.venue?.categories?.first?.name
-        addressLabel.text = item.venue?.location?.formattedAddress?.joined(separator: ", ")
+    func configure(item: Venue) {
+        self.itemId = item.id ?? ""
+        nameLabel.text = item.name
+        distanceLabel.text = "\(item.location?.distance ?? 0) metres away"
+        categoryLabel.text = item.categories?.first?.name
+        addressLabel.text = item.location?.formattedAddress?.joined(separator: ", ")
 
-        if let url = item.venue?.categories?.first?.icon?.url {
+        if let url = item.categories?.first?.icon?.url {
             print(url)
             iconImageView.kf.setImage(with: url)
         }
-        isDisliked = item.venue?.isDisliked ?? false
-        setupButton(isDisliked: item.venue?.isDisliked ?? false)
+        isDisliked = item.isDisliked
+        setupButton(isDisliked: item.isDisliked)
     }
 
     fileprivate func setupButton(isDisliked: Bool) {

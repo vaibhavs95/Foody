@@ -27,7 +27,7 @@ class HomeViewController: UIViewController {
 
     let locationManager = CLLocationManager()
     var storedVenues: [ManagedVenue] = []
-    var recommendations: RecommendedResponse?
+    var venues: [Venue?] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,7 +85,7 @@ class HomeViewController: UIViewController {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
                     let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
-                    self.recommendations = result
+                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
                     
                     DispatchQueue.main.async {
                         self.tableview.reloadData()
@@ -141,12 +141,12 @@ class HomeViewController: UIViewController {
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recommendations?.groups?.first?.items?.count ?? 0
+        return venues.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: VenueTableViewCell.self), for: indexPath) as! VenueTableViewCell
-        guard let itemForCell = recommendations?.groups?.first?.items?[indexPath.row]
+        guard let itemForCell = venues[indexPath.row]
 
             else { return cell }
         cell.configure(item: itemForCell)
@@ -165,8 +165,8 @@ extension HomeViewController: VenueTableViewCellDelegate {
 
     func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
 //        save(id: id)
-        if let index = recommendations?.groups?.first?.items?.index(where: { $0.venue?.id == id }) {
-            recommendations?.groups?[0].items?[index].venue?.isDisliked = disliked
+        if let index = venues.index(where: { $0?.id == id }) {
+            venues[index]?.isDisliked = disliked
         }
     }
 }
