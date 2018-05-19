@@ -25,9 +25,6 @@ class ViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
-//        for name in ["Rahul", "Sahul", "Mahul"] {
-//            self.save(id: name)
-//        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
