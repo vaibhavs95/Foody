@@ -10,13 +10,14 @@ import UIKit
 import CoreLocation
 import CoreData
 
+let client_id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
+let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
+let foursquare_version = "20180519"
+
 class ViewController: UIViewController {
 
-    let client_id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
-    let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
-    let foursquare_version = "20180519"
     let locationManager = CLLocationManager()
-    var storedVenues: [NSManagedObject] = []
+    var storedVenues: [ManagedVenue] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,12 +26,37 @@ class ViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
+        customizeNavBar()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         fetch()
+    }
+
+    private func customizeNavBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = "Recommendations"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(searchButtontapped(_:)))
+    }
+
+    @objc func searchButtontapped(_ sender: UIBarButtonItem) {
+        navigationItem.setRightBarButton(nil, animated: true)
+
+        let searchBar = UISearchBar(frame: CGRect(x: UIScreen.main.bounds.width - 50, y: 0, width: 0, height: 44))
+        searchBar.searchBarStyle = .minimal
+        searchBar.showsCancelButton = true
+        searchBar.delegate = self
+        searchBar.alpha = 0
+
+        navigationItem.titleView = searchBar
+        UIView.animate(withDuration: 0.25, animations: {
+            searchBar.alpha = 1
+            searchBar.frame = self.navigationItem.accessibilityFrame
+        }, completion: { finished in
+            searchBar.becomeFirstResponder()
+        })
     }
 
     func snapToPlace(location: CLLocationCoordinate2D) {
@@ -90,8 +116,7 @@ class ViewController: UIViewController {
         let managedContext = appDelegate.persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<ManagedVenue>(entityName: "ManagedVenue")
         do {
-            let savedVenues = try managedContext.fetch(fetchRequest)
-            print(savedVenues)
+            storedVenues = try managedContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
@@ -101,7 +126,7 @@ class ViewController: UIViewController {
 extension ViewController: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Location Manager failed : \(error.localizedDescription)")
+        print("Location Manager failed with error : \(error.localizedDescription)")
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -117,5 +142,23 @@ extension ViewController: CLLocationManagerDelegate {
             snapToPlace(location: newLocation.coordinate)
         }
     }
+}
 
+extension ViewController: UISearchBarDelegate {
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        // Todo: Call the seach API
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+
+        UIView.animate(withDuration: 0.25, animations: {
+            searchBar.alpha = 0
+            searchBar.frame.origin.x = UIScreen.main.bounds.width
+        }, completion: { finished in
+            searchBar.resignFirstResponder()
+            self.navigationItem.titleView = nil
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(self.searchButtontapped(_:)))
+        })
+    }
 }
