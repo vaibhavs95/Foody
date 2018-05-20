@@ -11,6 +11,11 @@ import Kingfisher
 
 class DetailsViewController: UIViewController {
 
+    @IBOutlet weak var scrollView: UIScrollView! {
+        didSet {
+            scrollView.setContentOffset(CGPoint(x: 0, y: scrollView.contentOffset.y), animated: true)
+        }
+    }
     @IBOutlet weak var imageView: UIImageView! {
         didSet {
             imageView.layer.masksToBounds = true
