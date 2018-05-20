@@ -51,13 +51,12 @@ class HomeViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
-        customizeNavBar()
-        navigationController?.pushViewController(DetailsViewController(), animated: true)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        customizeNavBar()
         fetchDisliked()
     }
 
@@ -195,7 +194,10 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+        if let id = self.venues[indexPath.row]?.id {
+            let detailsVc = DetailsViewController(venueId: id)
+            navigationController?.pushViewController(detailsVc, animated: true)
+        }
     }
 }
 
