@@ -8,17 +8,14 @@
 
 import UIKit
 import Kingfisher
+import MapKit
 
 class DetailsViewController: UIViewController {
 
+    @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var scrollView: UIScrollView! {
         didSet {
             scrollView.setContentOffset(CGPoint(x: 0, y: scrollView.contentOffset.y), animated: true)
-        }
-    }
-    @IBOutlet weak var imageView: UIImageView! {
-        didSet {
-            imageView.layer.masksToBounds = true
         }
     }
     @IBOutlet weak var nameLabel: UILabel!
@@ -62,6 +59,14 @@ class DetailsViewController: UIViewController {
         super.viewWillAppear(animated)
 
         navigationController?.navigationBar.prefersLargeTitles = false
+        let directionsBarButton = UIBarButtonItem(title: "Get Directions", style: .plain, target: self, action: #selector(getDirections))
+        navigationItem.rightBarButtonItem = directionsBarButton
+    }
+
+    @objc func getDirections() {
+        let loc = mapView.annotations.first as! MapPin
+        let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking]
+        loc.mapItem().openInMaps(launchOptions: launchOptions)
     }
 
     private func setup(id: String) {
@@ -71,15 +76,24 @@ class DetailsViewController: UIViewController {
                 self.hideLoader()
                 self.details = details
                 self.configureView(with: details)
+                self.configureMaps()
             }
         }
     }
 
+    private func configureMaps() {
+        guard let lattitude = details?.location?.lattitude, let longitude = details?.location?.longitude else { return }
+
+        let location = CLLocationCoordinate2D(latitude: lattitude, longitude: longitude)
+        let coordinateRegion = MKCoordinateRegionMakeWithDistance(location, 2500, 2500)
+        mapView.setRegion(coordinateRegion, animated: true)
+        mapView.addAnnotation(MapPin(title: details?.name, foursquareId: venueId, coordinate: location))
+    }
+
     private func configureView(with venue: VenueDetails?) {
 
-        navigationItem.title = venue?.name
+        title = venue?.name
 
-        imageView.kf.setImage(with: venue?.bestPhoto?.photoUrl)
         nameLabel.text = venue?.name
         ratingLabel.text = "  \(venue?.rating ?? 0.0)  "
         ratingLabel.backgroundColor = UIColor(hexString: venue?.ratingColor ?? "000000") ?? UIColor.black
