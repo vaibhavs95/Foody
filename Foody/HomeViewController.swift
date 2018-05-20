@@ -10,10 +10,6 @@ import UIKit
 import CoreLocation
 import CoreData
 
-let client_id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
-let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
-let foursquare_version = "20180519"
-
 class HomeViewController: UIViewController {
 
     @IBOutlet weak var tableview: UITableView! {
@@ -56,6 +52,7 @@ class HomeViewController: UIViewController {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
         customizeNavBar()
+        navigationController?.pushViewController(DetailsViewController(), animated: true)
     }
 
     override func viewWillAppear(_ animated: Bool) {
