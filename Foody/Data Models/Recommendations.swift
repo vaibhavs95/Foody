@@ -121,7 +121,7 @@ struct Category: Codable {
 
     var id: String?
     var name: String?
-    var icon: Icon?
+    var icon: Photo?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -130,12 +130,14 @@ struct Category: Codable {
     }
 }
 
-struct Icon: Codable {
+struct Photo: Codable {
 
+    var width: Int?
+    var height: Int?
     var prefix: String?
     var suffix: String?
 
-    var url: URL? {
+    var iconUrl: URL? {
         if let pre = prefix, let suf = suffix {
 
             return URL(string: "\(pre)88\(suf)")
@@ -143,7 +145,18 @@ struct Icon: Codable {
         return nil
     }
 
+    var photoUrl: URL? {
+        if let pre = prefix, let suf = suffix {
+
+            return URL(string: "\(pre)\(width ?? 500)x\(height ?? 500)\(suf)")
+        }
+        return nil
+    }
+
     enum CodingKeys: String, CodingKey {
+
+        case width
+        case height
         case prefix
         case suffix
     }

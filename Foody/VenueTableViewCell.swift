@@ -52,7 +52,7 @@ class VenueTableViewCell: UITableViewCell {
         categoryLabel.text = item.categories?.first?.name
         addressLabel.text = item.location?.formattedAddress?.joined(separator: ", ")
 
-        if let url = item.categories?.first?.icon?.url {
+        if let url = item.categories?.first?.icon?.iconUrl {
             print(url)
             iconImageView.kf.setImage(with: url)
         }
