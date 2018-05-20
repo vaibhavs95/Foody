@@ -13,15 +13,18 @@ import CoreLocation
 class FoodyTests: XCTestCase {
 
     var sessionUnderTest: URLSession!
+    var homeViewModel: HomeViewModel!
 
     override func setUp() {
         super.setUp()
 
         sessionUnderTest = URLSession(configuration: URLSessionConfiguration.default)
+        homeViewModel = HomeViewModel(context: (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext)
     }
     
     override func tearDown() {
         sessionUnderTest = nil
+        homeViewModel = nil
 
         super.tearDown()
     }
@@ -44,11 +47,36 @@ class FoodyTests: XCTestCase {
         }
         dataTask.resume()
         waitForExpectations(timeout: 5, handler: nil)
+
     }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+
+    func testAPICallCompletes () {
+        let request = Router.fetchRecommended(location: CLLocationCoordinate2D(latitude: 28.6720616290574, longitude: 77.2859521098061), limit: 20).asUrlRequest()!
+        let promise = expectation(description: "Completion handler invoked")
+        var statusCode: Int?
+        var responseError: Error?
+
+        let dataTask = sessionUnderTest.dataTask(with: request) { (data, response, error) in
+            statusCode = (response as? HTTPURLResponse)?.statusCode
+            responseError = error
+            promise.fulfill()
+        }
+        dataTask.resume()
+        waitForExpectations(timeout: 5, handler: nil)
+
+        XCTAssertNil(responseError)
+        XCTAssertEqual(statusCode, 200)
+    }
+
+    func testDislikedVenuesDeleted() {
+        let dislikedVenues = homeViewModel.fetchDisliked()
+        homeViewModel.fetchRecommended(router: .fetchRecommended(location: CLLocationCoordinate2D(latitude: 28.6720616290574, longitude: 77.2859521098061), limit: 20)) { (venues) in
+            let randomIndex = Int(arc4random_uniform(UInt32(dislikedVenues.count)))
+            let randomId = dislikedVenues[randomIndex].value(forKey: "id") as! String
+            let matches = venues.filter { $0?.id == randomId }
+
+            XCTAssertNil(matches)
+        }
     }
     
     func testPerformanceExample() {
