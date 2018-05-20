@@ -90,7 +90,7 @@ class HomeViewController: UIViewController {
     }
 
     @objc private func refreshData(_ sender: UIRefreshControl) {
-        sender.endRefreshing()
+        getRecommendations(at: currentLocation)
     }
 
     func search(with query: String, at location: CLLocationCoordinate2D) {
@@ -111,10 +111,11 @@ class HomeViewController: UIViewController {
     }
 
     private func reloadView(with venues: [Venue?]) {
+        refreshControl.endRefreshing()
         self.venues = venues
-        self.tableview.isHidden = false
-        self.tableview.reloadData()
-        self.hideLoader()
+        tableview.isHidden = false
+        tableview.reloadData()
+        hideLoader()
     }
 
 }
