@@ -41,21 +41,6 @@
             </objects>
             <point key="canvasLocation" x="634" y="95"/>
         </scene>
-        <!--Details View Controller-->
-        <scene sceneID="cZk-tO-bnX">
-            <objects>
-                <viewController id="Zun-DK-y7R" customClass="DetailsViewController" customModule="Foody" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="APY-ac-ulZ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <viewLayoutGuide key="safeArea" id="tvi-v3-odG"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="3vw-tj-chx" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1548" y="95"/>
-        </scene>
         <!--Navigation Controller-->
         <scene sceneID="6VF-4N-z0B">
             <objects>
