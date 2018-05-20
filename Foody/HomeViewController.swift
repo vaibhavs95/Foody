@@ -89,9 +89,13 @@ class HomeViewController: UIViewController {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
                     let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
-                    let unFilteredVenues = result?.groups?.first?.items?.map { return $0.venue } ?? []
+                    //Map the response to the Venue Data Type
+                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
+
+                    //Filter the response removing the disliked places
+//                    var dislikedVenues: [Venue?] = []
                     for disliked in self.dislikedVenues {
-                        self.venues = unFilteredVenues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
+                        self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
                     }
 
                     DispatchQueue.main.async {
