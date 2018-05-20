@@ -119,6 +119,7 @@ class HomeViewController: UIViewController {
 
                     DispatchQueue.main.async {
                         self.tableview.reloadData()
+                        self.tableview.refreshControl?.endRefreshing()
                         self.checkCount(currentOffset: offset)
                     }
                     print(result as Any)
