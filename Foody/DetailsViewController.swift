@@ -18,11 +18,6 @@ class DetailsViewController: UIViewController {
             scrollView.setContentOffset(CGPoint(x: 0, y: scrollView.contentOffset.y), animated: true)
         }
     }
-    @IBOutlet weak var imageView: UIImageView! {
-        didSet {
-            imageView.layer.masksToBounds = true
-        }
-    }
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var ratingLabel: UILabel! {
         didSet {
@@ -99,7 +94,6 @@ class DetailsViewController: UIViewController {
 
         title = venue?.name
 
-        imageView.kf.setImage(with: venue?.bestPhoto?.photoUrl)
         nameLabel.text = venue?.name
         ratingLabel.text = "  \(venue?.rating ?? 0.0)  "
         ratingLabel.backgroundColor = UIColor(hexString: venue?.ratingColor ?? "000000") ?? UIColor.black
