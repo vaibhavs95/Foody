@@ -73,7 +73,7 @@ class HomeViewModel: NSObject {
         if disliked {
             //Save in the Database
             saveDisliked(id)
-
+            self.dislikedVenues = fetchDisliked()
         } else if let managedContext = context {
             //Remove from the database to display again if not disliked
             dislikedVenues = fetchDisliked()
