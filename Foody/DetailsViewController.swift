@@ -43,6 +43,7 @@ class DetailsViewController: UIViewController {
 
     private var venueId = String()
     private var details: VenueDetails?
+    private var viewModel: DetailViewModel!
 
     convenience init(venueId: String) {
         self.init()
@@ -53,6 +54,7 @@ class DetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        viewModel = DetailViewModel(id: self.venueId)
         getDetails(id: venueId)
     }
 
@@ -63,31 +65,13 @@ class DetailsViewController: UIViewController {
     }
 
     private func getDetails(id: String) {
-        let endPoint = "https://api.foursquare.com/v2/venues/\(id)?v=\(foursquare_version)&client_id=\(client_id)&client_secret=\(client_secret)"
-
-        if let url = URL(string: endPoint) {
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-
-            showLoader()
-
-            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
-                if error != nil {
-                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
-                } else {
-                     let result = self.decodeResponse(data: data, type: VenueDetailResponse.self)
-                    print(result as Any)
-
-                    DispatchQueue.main.async {
-                        self.hideLoader()
-                        self.details = result?.details
-                        self.configureView(with: result?.details)
-                    }
-                }
-            })
-            dataTask.resume()
+        showLoader()
+        viewModel.fetchDetails(router: .fetchDetails(id: id)) { (details) in
+            DispatchQueue.main.async {
+                self.hideLoader()
+                self.details = details
+                self.configureView(with: details)
+            }
         }
     }
 
@@ -123,17 +107,5 @@ class DetailsViewController: UIViewController {
             }
         }
 
-    }
-
-    private func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
-        do {
-            if let data = data {
-                let response = try decoder.decode(FoursquareResponse<T>.self, from: data)
-                return response.response
-            }
-        } catch let error {
-            print("Error while decoding -> \(error.localizedDescription)")
-        }
-        return nil
     }
 }
