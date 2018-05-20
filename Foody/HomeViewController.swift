@@ -30,22 +30,23 @@ class HomeViewController: UIViewController {
         }
     }
 
+    lazy private var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.tintColor = UIColor.brown
+        control.attributedTitle = NSAttributedString(string: "Fetching Venues", attributes: [NSAttributedStringKey.foregroundColor: UIColor.brown])
+        control.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return control
+    }()
     private let context: NSManagedObjectContext? = {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
 
         return appDelegate.persistentContainer.viewContext
     }()
     private let locationManager = CLLocationManager()
+    private var currentLocation = CLLocationCoordinate2D()
     private var dislikedVenues: [NSManagedObject] = []
-    lazy private var refreshControl: UIRefreshControl = {
-        let control = UIRefreshControl()
-//        control.tintColor = UIColor.defaultBlue
-        control.attributedTitle = NSAttributedString(string: "Lemme do my thang Bitch!")
-        control.addTarget(self, action: #selector(refreshData), for: .valueChanged)
-        return control
-    }()
     private var venues: [Venue?] = []
-    private let offset: Int = 0
+//    private var venueApiOffset: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,8 +92,9 @@ class HomeViewController: UIViewController {
         sender.endRefreshing()
     }
 
-    func snapToPlace(location: CLLocationCoordinate2D) {
-        let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=25&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
+    func snapToPlace(location: CLLocationCoordinate2D, offset: Int = 0) {
+        let limit = 15 + offset
+        let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=\(limit)&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
 
 //         let searchEndPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
 
@@ -117,6 +119,7 @@ class HomeViewController: UIViewController {
 
                     DispatchQueue.main.async {
                         self.tableview.reloadData()
+                        self.checkCount(currentOffset: offset)
                     }
                     print(result as Any)
                 }
@@ -126,7 +129,13 @@ class HomeViewController: UIViewController {
 
     }
 
-    func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
+    private func checkCount(currentOffset: Int) {
+        if venues.count < 10 {
+            snapToPlace(location: currentLocation, offset: currentOffset + 10)
+        }
+    }
+
+     private func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
         do {
             if let data = data {
                 let response = try decoder.decode(FoursquareResponse<T>.self, from: data)
@@ -222,6 +231,7 @@ extension HomeViewController: CLLocationManagerDelegate {
             print(newLocation.coordinate.latitude)
             print(newLocation.coordinate.longitude)
 
+            self.currentLocation = newLocation.coordinate
             snapToPlace(location: newLocation.coordinate)
         }
     }
