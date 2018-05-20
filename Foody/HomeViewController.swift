@@ -21,24 +21,16 @@ class HomeViewController: UIViewController {
             tableview.dataSource = self
             tableview.delegate = self
             tableview.rowHeight = UITableViewAutomaticDimension
+            tableview.isHidden = true
             if #available(iOS 10, *) {
                 tableview.refreshControl = self.refreshControl
             } else {
                 tableview.addSubview(self.refreshControl)
             }
-            tableview.isHidden = true
             tableview.register(UINib(nibName: String(describing: VenueTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: VenueTableViewCell.self))
         }
     }
 
-    lazy private var activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
-        activityIndicator.frame = CGRect(origin: view.bounds.origin, size: CGSize(width: 75, height: 75))
-        activityIndicator.backgroundColor = .darkGray
-        activityIndicator.layer.cornerRadius = 15
-        activityIndicator.center = view.center
-        return activityIndicator
-    }()
     lazy private var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.tintColor = UIColor.brown
@@ -70,7 +62,6 @@ class HomeViewController: UIViewController {
         super.viewWillAppear(animated)
 
         fetchDisliked()
-        showLoader()
     }
 
     private func customizeNavBar() {
@@ -113,6 +104,7 @@ class HomeViewController: UIViewController {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 
+            showLoader()
             let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
                 if error != nil {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
