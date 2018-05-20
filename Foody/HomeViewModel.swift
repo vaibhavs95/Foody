@@ -1,0 +1,135 @@
+//
+//  HomeViewModel.swift
+//  Foody
+//
+//  Created by Vaibhav Singh on 20/05/18.
+//  Copyright © 2018 Vaibhav. All rights reserved.
+//
+
+import Foundation
+import CoreData
+import CoreLocation
+
+class HomeViewModel: NSObject {
+
+    private var context: NSManagedObjectContext?
+    private var venues: [Venue?] = []
+    private var dislikedVenues: [NSManagedObject] = []
+
+    convenience init(context: NSManagedObjectContext?) {
+        self.init()
+
+        self.context = context
+    }
+
+    func setup() {
+        dislikedVenues = fetchDisliked()
+    }
+
+    func fetchRecommended(router: Router, completion: @escaping (([Venue?]) -> ())) {
+
+        if let request = router.asUrlRequest() {
+            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+
+                if error != nil {
+                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
+
+                } else {
+                    let result = NetworkManager.decodeResponse(data: data, type: RecommendedResponse.self)
+                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
+
+                    //Filter the response removing the disliked places
+                    for disliked in self.dislikedVenues {
+                        self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
+                    }
+
+                    print(self.venues as Any)
+                    if self.venues.count > 10 {
+                        DispatchQueue.main.async {
+                            completion(self.venues)
+                        }
+                    } else {
+                        self.fetchRecommended(router: router.increaseLimit(by: 10), completion: completion)
+                    }
+                }
+            })
+            dataTask.resume()
+        }
+    }
+
+    func searchVenues(router: Router, completion: @escaping (([Venue?]) -> ())) {
+        if let request = router.asUrlRequest() {
+            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+
+                if error != nil {
+                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
+
+                } else {
+                    let result = NetworkManager.decodeResponse(data: data, type: SearchResponse.self)
+                    self.venues = result?.venues ?? []
+                    print(self.venues as Any)
+
+                    DispatchQueue.main.async {
+                        completion(self.venues)
+                    }
+                }
+            })
+            dataTask.resume()
+        }
+    }
+
+    func dislikeButtonTapped(_ disliked: Bool, at id: String) {
+        if let index = venues.index(where: { $0?.id == id }) {
+            //Save current state in Data Models
+            venues[index]?.isDisliked = disliked
+        }
+
+        if disliked {
+            //Save in the Database
+            saveDisliked(id)
+
+        } else if let managedContext = context {
+            //Remove from the database to display again if not disliked
+            dislikedVenues = fetchDisliked()
+            if let indexToDelete = dislikedVenues.index(where: { ($0.value(forKey: "id") as! String) == id }) {
+                managedContext.delete(dislikedVenues[indexToDelete])
+                dislikedVenues.remove(at: indexToDelete)
+                saveDBState(context: managedContext)
+            }
+        }
+    }
+
+    //Mark :- CoreData methods
+    func saveDisliked(_ id: String) {
+         guard let managedContext = context else { return }
+        let entity = NSEntityDescription.entity(forEntityName: "ManagedVenue", in: managedContext)!
+        let person = NSManagedObject(entity: entity, insertInto: managedContext)
+        person.setValue(id, forKey: "id")
+
+        saveDBState(context: managedContext)
+    }
+
+    func fetchDisliked() -> [NSManagedObject] {
+         guard let managedContext = context else { return [] }
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ManagedVenue")
+        do {
+            let dislikedVenues = try managedContext.fetch(fetchRequest)
+
+            return dislikedVenues
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+
+        return []
+    }
+
+    func saveDBState(context: NSManagedObjectContext) {
+        do {
+            try context.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
+}
+
+

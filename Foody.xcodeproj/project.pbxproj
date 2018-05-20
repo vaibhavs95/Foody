@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		21C7D81D3D9CD27EF174C40D /* Pods_Foody.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DAFE614A659D91599855895 /* Pods_Foody.framework */; };
 		221D113D20B1BEC20009F528 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221D113C20B1BEC20009F528 /* NetworkManager.swift */; };
+		221D113F20B1D1560009F528 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221D113E20B1D1560009F528 /* HomeViewModel.swift */; };
 		2265BCAB20AF6F2A00709490 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2265BCAA20AF6F2A00709490 /* Search.swift */; };
 		2291402520B0B2D600AA2718 /* VenueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */; };
 		2291402620B0B2D600AA2718 /* VenueTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2291402420B0B2D600AA2718 /* VenueTableViewCell.xib */; };
@@ -29,6 +30,7 @@
 /* Begin PBXFileReference section */
 		1DAFE614A659D91599855895 /* Pods_Foody.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Foody.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		221D113C20B1BEC20009F528 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		221D113E20B1D1560009F528 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		2265BCAA20AF6F2A00709490 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VenueTableViewCell.swift; sourceTree = "<group>"; };
 		2291402420B0B2D600AA2718 /* VenueTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VenueTableViewCell.xib; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 				22D2184A20AF136F00D15DFB /* AppDelegate.swift */,
 				221D113C20B1BEC20009F528 /* NetworkManager.swift */,
 				22D2184C20AF136F00D15DFB /* HomeViewController.swift */,
+				221D113E20B1D1560009F528 /* HomeViewModel.swift */,
 				22FFD07520B1789100A2E4DF /* DetailsViewController.swift */,
 				2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */,
 				2291402720B0DAC500AA2718 /* Extensions.swift */,
@@ -267,6 +270,7 @@
 				221D113D20B1BEC20009F528 /* NetworkManager.swift in Sources */,
 				22D2184D20AF136F00D15DFB /* HomeViewController.swift in Sources */,
 				2265BCAB20AF6F2A00709490 /* Search.swift in Sources */,
+				221D113F20B1D1560009F528 /* HomeViewModel.swift in Sources */,
 				22D2184B20AF136F00D15DFB /* AppDelegate.swift in Sources */,
 				22FFD07420B16CF600A2E4DF /* VenueDetails.swift in Sources */,
 				22995D6820AF6BD2008777D3 /* Recommendations.swift in Sources */,
