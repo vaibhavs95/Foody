@@ -90,11 +90,33 @@ class HomeViewController: UIViewController {
         sender.endRefreshing()
     }
 
-    func snapToPlace(location: CLLocationCoordinate2D, offset: Int = 0) {
+    func search(with query: String, at location: CLLocationCoordinate2D) {
+        showLoader()
+        if let url = Router.search(query: query, location: location).endPoint {
+            var request = URLRequest(url: url)
+            request.authorize()
+
+            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+                if error != nil {
+                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
+                } else {
+                    let result = NetworkManager.decodeResponse(data: data, type: SearchResponse.self)
+                    print(result as Any)
+                    self.venues = result?.venues ?? []
+                    DispatchQueue.main.async {
+                        self.hideLoader()
+                        self.tableview.isHidden = false
+                        self.tableview.reloadData()
+                    }
+                }
+            })
+            dataTask.resume()
+        }
+    }
+
+    func getRecommendations(at location: CLLocationCoordinate2D, offset: Int = 0 ) {
         let limit = 15 + offset
         let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=\(limit)&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
-
-//         let searchEndPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
 
         if let url = URL(string: endPoint) {
             var request = URLRequest(url: url)
@@ -133,7 +155,7 @@ class HomeViewController: UIViewController {
 
     private func checkCount(currentOffset: Int) {
         if venues.count < 10 {
-            snapToPlace(location: currentLocation, offset: currentOffset + 10)
+            getRecommendations(at: currentLocation, offset: currentOffset + 10)
         }
     }
 
@@ -206,7 +228,10 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 extension HomeViewController: UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // Todo: Call the seach API
+        if let query = searchBar.text {
+            searchBar.resignFirstResponder()
+            self.search(with: query, at: self.currentLocation)
+        }
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -230,6 +255,7 @@ extension HomeViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 
         if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -30 || newLocation.horizontalAccuracy <= 100 {
+
             // Invalidate the Location Manager for further updates
             locationManager.stopUpdatingLocation()
             locationManager.delegate = nil
@@ -237,7 +263,7 @@ extension HomeViewController: CLLocationManagerDelegate {
             print(newLocation.coordinate.longitude)
 
             self.currentLocation = newLocation.coordinate
-            snapToPlace(location: newLocation.coordinate)
+            getRecommendations(at: newLocation.coordinate)
         }
     }
 }
@@ -246,7 +272,7 @@ extension HomeViewController: VenueTableViewCellDelegate {
 
     func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
         if let index = venues.index(where: { $0?.id == id }) {
-            //Save current state in Data Model
+            //Save current state in Data Models
             venues[index]?.isDisliked = disliked
         }
 

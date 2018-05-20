@@ -22,7 +22,7 @@ enum Router {
     var endPoint: URL? {
         switch self {
         case .search(let query, let location):
-            return URL(string: "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=\(query)&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)")
+            return URL(string: "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=\(query)&limit=10&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)")
         case .fetchRecommended(let location, let limit):
             return URL(string: "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=\(limit)&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)")
         case .fetchDetails(let id):
