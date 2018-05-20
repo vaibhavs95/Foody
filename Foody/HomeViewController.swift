@@ -39,6 +39,7 @@ class HomeViewController: UIViewController {
 
         return appDelegate.persistentContainer.viewContext
     }()
+
     private let locationManager = CLLocationManager()
     private var currentLocation = CLLocationCoordinate2D()
     private var dislikedVenues: [NSManagedObject] = []
@@ -91,10 +92,10 @@ class HomeViewController: UIViewController {
     }
 
     func search(with query: String, at location: CLLocationCoordinate2D) {
-        showLoader()
-        if let url = Router.search(query: query, location: location).endPoint {
-            var request = URLRequest(url: url)
-            request.authorize()
+        if let request = Router
+                        .search(query: query, location: location)
+                        .asUrlRequest() {
+            showLoader()
 
             let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
                 if error != nil {
@@ -116,15 +117,12 @@ class HomeViewController: UIViewController {
 
     func getRecommendations(at location: CLLocationCoordinate2D, offset: Int = 0 ) {
         let limit = 15 + offset
-        let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=\(limit)&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
 
-        if let url = URL(string: endPoint) {
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-
+        if let request = Router
+                        .fetchRecommended(location: location, limit: limit)
+                        .asUrlRequest() {
             showLoader()
+
             let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
                 if error != nil {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
@@ -141,7 +139,6 @@ class HomeViewController: UIViewController {
                     DispatchQueue.main.async {
                         self.tableview.isHidden = false
                         self.tableview.reloadData()
-                        self.tableview.refreshControl?.endRefreshing()
                         self.hideLoader()
                         self.checkCount(currentOffset: offset)
                     }

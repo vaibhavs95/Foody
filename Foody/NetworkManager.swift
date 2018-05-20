@@ -29,6 +29,15 @@ enum Router {
             return URL(string: "https://api.foursquare.com/v2/venues/\(id)?v=\(foursquare_version)&client_id=\(client_id)&client_secret=\(client_secret)")
         }
     }
+
+    func asUrlRequest() -> URLRequest? {
+        guard let url = endPoint else { return nil }
+
+        var request = URLRequest(url: url)
+        request.authorize()
+
+        return request
+    }
 }
 
 extension URLRequest {
