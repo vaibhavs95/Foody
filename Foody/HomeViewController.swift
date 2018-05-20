@@ -26,10 +26,19 @@ class HomeViewController: UIViewController {
             } else {
                 tableview.addSubview(self.refreshControl)
             }
+            tableview.isHidden = true
             tableview.register(UINib(nibName: String(describing: VenueTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: VenueTableViewCell.self))
         }
     }
 
+    lazy private var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        activityIndicator.frame = CGRect(origin: view.bounds.origin, size: CGSize(width: 75, height: 75))
+        activityIndicator.backgroundColor = .darkGray
+        activityIndicator.layer.cornerRadius = 15
+        activityIndicator.center = view.center
+        return activityIndicator
+    }()
     lazy private var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.tintColor = UIColor.brown
@@ -46,7 +55,6 @@ class HomeViewController: UIViewController {
     private var currentLocation = CLLocationCoordinate2D()
     private var dislikedVenues: [NSManagedObject] = []
     private var venues: [Venue?] = []
-//    private var venueApiOffset: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +70,7 @@ class HomeViewController: UIViewController {
         super.viewWillAppear(animated)
 
         fetchDisliked()
+        showLoader()
     }
 
     private func customizeNavBar() {
@@ -118,8 +127,10 @@ class HomeViewController: UIViewController {
                     }
 
                     DispatchQueue.main.async {
+                        self.tableview.isHidden = false
                         self.tableview.reloadData()
                         self.tableview.refreshControl?.endRefreshing()
+                        self.hideLoader()
                         self.checkCount(currentOffset: offset)
                     }
                     print(result as Any)
