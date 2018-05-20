@@ -26,7 +26,7 @@ class DetailsViewController: UIViewController {
     }
 
     private func getDetails(id: String) {
-        let endPoint = "https://api.foursquare.com/v2/venues/\(id)"
+        let endPoint = "https://api.foursquare.com/v2/venues/\(id)?v=\(foursquare_version)&client_id=\(client_id)&client_secret=\(client_secret)"
         if let url = URL(string: endPoint) {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
@@ -39,8 +39,11 @@ class DetailsViewController: UIViewController {
                 if error != nil {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
-                     let result = self.decodeResponse(data: data, type: VenueDetailResponse.self)?.details
+                     let result = self.decodeResponse(data: data, type: VenueDetailResponse.self)
                     print(result as Any)
+                    DispatchQueue.main.async {
+                        self.hideLoader()
+                    }
                 }
             })
             dataTask.resume()

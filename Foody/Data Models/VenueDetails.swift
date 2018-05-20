@@ -14,7 +14,7 @@ struct VenueDetailResponse: Codable {
 
     enum CodingKeys: String, CodingKey {
 
-        case details = "response"
+        case details = "venue"
     }
 }
 
