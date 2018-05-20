@@ -17,7 +17,12 @@ class DetailsViewController: UIViewController {
         }
     }
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var ratingLabel: UILabel!
+    @IBOutlet weak var ratingLabel: UILabel! {
+        didSet {
+            ratingLabel.layer.cornerRadius = 10
+            ratingLabel.layer.masksToBounds = true
+        }
+    }
     @IBOutlet weak var distanceLabel: UILabel!
     @IBOutlet weak var addressLabel: UILabel!
     @IBOutlet weak var availabilityLabel: UILabel!
@@ -87,9 +92,8 @@ class DetailsViewController: UIViewController {
 
         imageView.kf.setImage(with: venue?.bestPhoto?.photoUrl)
         nameLabel.text = venue?.name
-        ratingLabel.text = "  \(String(describing: venue?.rating))  "
-        ratingLabel.backgroundColor = UIColor(hexString: venue?.ratingColor ?? "000000")
-        ratingLabel.layer.cornerRadius = 3
+        ratingLabel.text = "  \(venue?.rating ?? 0.0)  "
+        ratingLabel.backgroundColor = UIColor(hexString: venue?.ratingColor ?? "000000") ?? UIColor.black
         addressLabel.text = venue?.location?.formattedAddress?.joined(separator: ", ")
         let availability = venue?.hours?.isOpen ?? false
         availabilityLabel.text = availability ? "Open now" : "Closed"
