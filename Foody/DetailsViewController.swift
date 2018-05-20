@@ -55,7 +55,7 @@ class DetailsViewController: UIViewController {
         super.viewDidLoad()
 
         viewModel = DetailViewModel(id: self.venueId)
-        getDetails(id: venueId)
+        setup(id: venueId)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -64,7 +64,7 @@ class DetailsViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
     }
 
-    private func getDetails(id: String) {
+    private func setup(id: String) {
         showLoader()
         viewModel.fetchDetails(router: .fetchDetails(id: id)) { (details) in
             DispatchQueue.main.async {
