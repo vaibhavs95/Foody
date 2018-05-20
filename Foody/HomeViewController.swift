@@ -21,13 +21,32 @@ class HomeViewController: UIViewController {
             tableview.dataSource = self
             tableview.delegate = self
             tableview.rowHeight = UITableViewAutomaticDimension
+            if #available(iOS 10, *) {
+                tableview.refreshControl = self.refreshControl
+            } else {
+                tableview.addSubview(self.refreshControl)
+            }
             tableview.register(UINib(nibName: String(describing: VenueTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: VenueTableViewCell.self))
         }
     }
 
-    let locationManager = CLLocationManager()
-    var storedVenues: [ManagedVenue] = []
-    var recommendations: RecommendedResponse?
+    lazy private var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.tintColor = UIColor.brown
+        control.attributedTitle = NSAttributedString(string: "Fetching Venues", attributes: [NSAttributedStringKey.foregroundColor: UIColor.brown])
+        control.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return control
+    }()
+    private let context: NSManagedObjectContext? = {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
+
+        return appDelegate.persistentContainer.viewContext
+    }()
+    private let locationManager = CLLocationManager()
+    private var currentLocation = CLLocationCoordinate2D()
+    private var dislikedVenues: [NSManagedObject] = []
+    private var venues: [Venue?] = []
+//    private var venueApiOffset: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +61,7 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        fetch()
+        fetchDisliked()
     }
 
     private func customizeNavBar() {
@@ -69,10 +88,15 @@ class HomeViewController: UIViewController {
         })
     }
 
-    func snapToPlace(location: CLLocationCoordinate2D) {
-        let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=25&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
+    @objc private func refreshData(_ sender: UIRefreshControl) {
+        sender.endRefreshing()
+    }
 
-//         let endPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
+    func snapToPlace(location: CLLocationCoordinate2D, offset: Int = 0) {
+        let limit = 15 + offset
+        let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=\(limit)&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
+
+//         let searchEndPoint = "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=restaurant&limit=20&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)"
 
         if let url = URL(string: endPoint) {
             var request = URLRequest(url: url)
@@ -85,10 +109,18 @@ class HomeViewController: UIViewController {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
                 } else {
                     let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
-                    self.recommendations = result
-                    
+                    //Map the response to the Venue Data Type
+                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
+
+                    //Filter the response removing the disliked places
+                    for disliked in self.dislikedVenues {
+                        self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
+                    }
+
                     DispatchQueue.main.async {
                         self.tableview.reloadData()
+                        self.tableview.refreshControl?.endRefreshing()
+                        self.checkCount(currentOffset: offset)
                     }
                     print(result as Any)
                 }
@@ -98,7 +130,13 @@ class HomeViewController: UIViewController {
 
     }
 
-    func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
+    private func checkCount(currentOffset: Int) {
+        if venues.count < 10 {
+            snapToPlace(location: currentLocation, offset: currentOffset + 10)
+        }
+    }
+
+     private func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
         do {
             if let data = data {
                 let response = try decoder.decode(FoursquareResponse<T>.self, from: data)
@@ -110,30 +148,30 @@ class HomeViewController: UIViewController {
         return nil
     }
 
-    func save(id: String) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-
-        let managedContext = appDelegate.persistentContainer.viewContext
+    func saveDisliked(_ id: String) {
+        guard let managedContext = context else { return }
         let entity = NSEntityDescription.entity(forEntityName: "ManagedVenue", in: managedContext)!
         let person = NSManagedObject(entity: entity, insertInto: managedContext)
         person.setValue(id, forKey: "id")
 
+        saveDBState(context: managedContext)
+    }
+
+    func fetchDisliked() {
+        guard let managedContext = context else { return }
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ManagedVenue")
         do {
-            try managedContext.save()
+            dislikedVenues = try managedContext.fetch(fetchRequest)
         } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
+            print("Could not fetch. \(error), \(error.userInfo)")
         }
     }
 
-    func fetch() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-
-        let managedContext = appDelegate.persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<ManagedVenue>(entityName: "ManagedVenue")
+    func saveDBState(context: NSManagedObjectContext) {
         do {
-            storedVenues = try managedContext.fetch(fetchRequest)
+            try context.save()
         } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
+            print("Could not save. \(error), \(error.userInfo)")
         }
     }
 }
@@ -141,14 +179,16 @@ class HomeViewController: UIViewController {
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recommendations?.groups?.first?.items?.count ?? 0
+        return venues.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: VenueTableViewCell.self), for: indexPath) as! VenueTableViewCell
-        if let itemForCell = recommendations?.groups?.first?.items?[indexPath.row] {
-            cell.configure(item: itemForCell)
-        }
+        guard let itemForCell = venues[indexPath.row]
+
+            else { return cell }
+        cell.configure(item: itemForCell)
+        cell.delegate = self
         cell.selectionStyle = .none
 
         return cell
@@ -159,27 +199,6 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-extension HomeViewController: CLLocationManagerDelegate {
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Location Manager failed with error : \(error.localizedDescription)")
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -30 || newLocation.horizontalAccuracy <= 100 {
-
-            // Invalidate the Location Manager for further updates
-            locationManager.stopUpdatingLocation()
-            locationManager.delegate = nil
-
-            print(newLocation.coordinate.latitude)
-            print(newLocation.coordinate.longitude)
-
-            snapToPlace(location: newLocation.coordinate)
-        }
-    }
-}
-
 extension HomeViewController: UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -187,7 +206,6 @@ extension HomeViewController: UISearchBarDelegate {
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-
         UIView.animate(withDuration: 0.25, animations: {
             searchBar.alpha = 0
             searchBar.frame.origin.x = UIScreen.main.bounds.width
@@ -196,5 +214,50 @@ extension HomeViewController: UISearchBarDelegate {
             self.navigationItem.titleView = nil
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(self.searchButtontapped(_:)))
         })
+    }
+}
+
+extension HomeViewController: CLLocationManagerDelegate {
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Location Manager failed with error : \(error.localizedDescription)")
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+
+        if let newLocation = locations.last, newLocation.timestamp.timeIntervalSinceNow < -30 || newLocation.horizontalAccuracy <= 100 {
+            // Invalidate the Location Manager for further updates
+            locationManager.stopUpdatingLocation()
+            locationManager.delegate = nil
+            print(newLocation.coordinate.latitude)
+            print(newLocation.coordinate.longitude)
+
+            self.currentLocation = newLocation.coordinate
+            snapToPlace(location: newLocation.coordinate)
+        }
+    }
+}
+
+extension HomeViewController: VenueTableViewCellDelegate {
+
+    func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
+        if let index = venues.index(where: { $0?.id == id }) {
+            //Save current state in Data Model
+            venues[index]?.isDisliked = disliked
+        }
+
+        if disliked {
+            //Save in the Database
+            saveDisliked(id)
+
+        } else if let managedContext = context {
+            //Remove from the database to display again if not disliked
+            fetchDisliked()
+            if let indexToDelete = dislikedVenues.index(where: { ($0.value(forKey: "id") as! String) == id }) {
+                managedContext.delete(dislikedVenues[indexToDelete])
+                dislikedVenues.remove(at: indexToDelete)
+                saveDBState(context: managedContext)
+            }
+        }
     }
 }

@@ -78,6 +78,7 @@ struct Venue: Codable {
     var name: String?
     var location: Location?
     var categories: [Category]?
+    var isDisliked: Bool = false
 
     enum CodingKeys: String, CodingKey {
         case id

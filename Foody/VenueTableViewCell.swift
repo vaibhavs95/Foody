@@ -9,6 +9,10 @@
 import UIKit
 import Kingfisher
 
+protocol VenueTableViewCellDelegate: class {
+    func cellDislikeButtonTapped(disliked: Bool, itemWith id: String)
+}
+
 class VenueTableViewCell: UITableViewCell {
 
     @IBOutlet weak var nameLabel: UILabel!
@@ -17,18 +21,21 @@ class VenueTableViewCell: UITableViewCell {
     @IBOutlet weak var addressLabel: UILabel!
     @IBOutlet weak var iconImageView: UIImageView! {
         didSet {
-            iconImageView.backgroundColor = UIColor(red: 53/255, green: 92/255, blue: 125/255, alpha: 1)
+            iconImageView.backgroundColor = UIColor.tealBlue
             iconImageView.layer.cornerRadius = 10
         }
     }
     @IBOutlet weak var dislikeButton: UIButton! {
         didSet {
-            dislikeButton.layer.borderColor = UIColor(red: 0, green: 122/255, blue: 1, alpha: 1).cgColor
+            dislikeButton.layer.borderColor = UIColor.defaultBlue.cgColor
             dislikeButton.layer.borderWidth = 1
             dislikeButton.layer.cornerRadius = dislikeButton.bounds.height / 2
             dislikeButton.clipsToBounds = true
         }
     }
+    private var itemId = String()
+    private var isDisliked: Bool = false
+    weak var delegate: VenueTableViewCellDelegate?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -36,21 +43,34 @@ class VenueTableViewCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
     }
 
-    func configure(item: GroupItem) {
-        nameLabel.text = item.venue?.name
-        distanceLabel.text = "\(item.venue?.location?.distance ?? 0) metres away"
-        categoryLabel.text = item.venue?.categories?.first?.name
-        addressLabel.text = item.venue?.location?.formattedAddress?.joined(separator: ", ")
-        if let url = item.venue?.categories?.first?.icon?.url {
+    func configure(item: Venue) {
+        self.itemId = item.id ?? ""
+        nameLabel.text = item.name
+        distanceLabel.text = "\(item.location?.distance ?? 0) metres away"
+        categoryLabel.text = item.categories?.first?.name
+        addressLabel.text = item.location?.formattedAddress?.joined(separator: ", ")
+
+        if let url = item.categories?.first?.icon?.url {
             print(url)
             iconImageView.kf.setImage(with: url)
         }
+        isDisliked = item.isDisliked
+        setupButton(isDisliked: item.isDisliked)
+    }
+
+    fileprivate func setupButton(isDisliked: Bool) {
+        let themeColor = isDisliked ? UIColor.red : UIColor.defaultBlue
+        dislikeButton.setTitleColor(themeColor, for: .normal)
+        dislikeButton.layer.borderColor = themeColor.cgColor
+        dislikeButton.tintColor = themeColor
+        dislikeButton.setTitle("\(isDisliked ? "Disliked" : "Dislike")", for: .normal)
     }
     
     @IBAction func dislikeButtonTapped(_ sender: Any) {
-
+        isDisliked = !isDisliked
+        setupButton(isDisliked: isDisliked)
+        delegate?.cellDislikeButtonTapped(disliked: isDisliked, itemWith: itemId)
     }
 }
