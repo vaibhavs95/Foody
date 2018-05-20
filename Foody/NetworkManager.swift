@@ -59,6 +59,21 @@ extension URLRequest {
 
 struct NetworkManager {
 
+    static func createTask<T: Codable>(request: URLRequest, type: T.Type, completion: @escaping ((T?) -> ())) -> URLSessionDataTask {
+        let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if error != nil {
+                print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
+
+            } else {
+                let result = NetworkManager.decodeResponse(data: data, type: type)
+                print(result as Any)
+                completion(result)
+            }
+        }
+
+        return dataTask
+    }
+
     static func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
         do {
             if let data = data {

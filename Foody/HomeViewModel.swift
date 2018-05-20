@@ -29,29 +29,23 @@ class HomeViewModel: NSObject {
     func fetchRecommended(router: Router, completion: @escaping (([Venue?]) -> ())) {
 
         if let request = router.asUrlRequest() {
-            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+            let dataTask = NetworkManager.createTask(request: request, type: RecommendedResponse.self, completion: { (response) in
+                self.venues = response?.groups?.first?.items?.map { return $0.venue } ?? []
 
-                if error != nil {
-                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
-
-                } else {
-                    let result = NetworkManager.decodeResponse(data: data, type: RecommendedResponse.self)
-                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
-
-                    //Filter the response removing the disliked places
-                    for disliked in self.dislikedVenues {
-                        self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
-                    }
-
-                    print(self.venues as Any)
-                    if self.venues.count > 10 {
-                        DispatchQueue.main.async {
-                            completion(self.venues)
-                        }
-                    } else {
-                        self.fetchRecommended(router: router.increaseLimit(by: 10), completion: completion)
-                    }
+                //Filter the response removing the disliked places
+                for disliked in self.dislikedVenues {
+                    self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
                 }
+
+                if self.venues.count > 10 {
+                    DispatchQueue.main.async {
+                        completion(self.venues)
+                    }
+                } else {
+                    //Make another API call with more limit if objects are less than 10
+                    self.fetchRecommended(router: router.increaseLimit(by: 10), completion: completion)
+                }
+
             })
             dataTask.resume()
         }
@@ -59,19 +53,11 @@ class HomeViewModel: NSObject {
 
     func searchVenues(router: Router, completion: @escaping (([Venue?]) -> ())) {
         if let request = router.asUrlRequest() {
-            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
+            let dataTask = NetworkManager.createTask(request: request, type: SearchResponse.self, completion: { (response) in
+                self.venues = response?.venues ?? []
 
-                if error != nil {
-                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
-
-                } else {
-                    let result = NetworkManager.decodeResponse(data: data, type: SearchResponse.self)
-                    self.venues = result?.venues ?? []
-                    print(self.venues as Any)
-
-                    DispatchQueue.main.async {
-                        completion(self.venues)
-                    }
+                DispatchQueue.main.async {
+                    completion(self.venues)
                 }
             })
             dataTask.resume()
