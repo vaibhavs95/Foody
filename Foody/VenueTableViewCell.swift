@@ -48,7 +48,7 @@ class VenueTableViewCell: UITableViewCell {
     func configure(item: Venue) {
         self.itemId = item.id ?? ""
         nameLabel.text = item.name
-        distanceLabel.text = "\(item.location?.distance ?? 0) metres away"
+        distanceLabel.text = item.location?.distanceDescription
         categoryLabel.text = item.categories?.first?.name
         addressLabel.text = item.location?.formattedAddress?.joined(separator: ", ")
 

@@ -93,7 +93,7 @@ struct Location: Codable {
     var address: String?
     var countryCode: String?
     var street: String?
-    var distance: Int?
+    var distance: Double?
     var postalCode: String?
     var city:  String?
     var state: String?
@@ -101,6 +101,15 @@ struct Location: Codable {
     var lattitude: Double?
     var longitude: Double?
     var formattedAddress: [String]?
+
+    var distanceDescription: String? {
+        if let distance = distance {
+
+            return distance > 1000 ? "\(distance/1000.0) Kms away" : "\(distance) metres away"
+        }
+
+        return nil
+    }
 
     enum CodingKeys: String, CodingKey {
         case address
