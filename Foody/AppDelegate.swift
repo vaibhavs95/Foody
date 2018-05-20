@@ -9,6 +9,10 @@
 import UIKit
 import CoreData
 
+let client_id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
+let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
+let foursquare_version = "20180519"
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

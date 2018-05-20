@@ -93,7 +93,7 @@ struct Location: Codable {
     var address: String?
     var countryCode: String?
     var street: String?
-    var distance: Int?
+    var distance: Double?
     var postalCode: String?
     var city:  String?
     var state: String?
@@ -101,6 +101,15 @@ struct Location: Codable {
     var lattitude: Double?
     var longitude: Double?
     var formattedAddress: [String]?
+
+    var distanceDescription: String? {
+        if let distance = distance {
+
+            return distance > 1000 ? "\(distance/1000.0) Kms away" : "\(distance) metres away"
+        }
+
+        return nil
+    }
 
     enum CodingKeys: String, CodingKey {
         case address
@@ -121,7 +130,7 @@ struct Category: Codable {
 
     var id: String?
     var name: String?
-    var icon: Icon?
+    var icon: Photo?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -130,12 +139,14 @@ struct Category: Codable {
     }
 }
 
-struct Icon: Codable {
+struct Photo: Codable {
 
+    var width: Int?
+    var height: Int?
     var prefix: String?
     var suffix: String?
 
-    var url: URL? {
+    var iconUrl: URL? {
         if let pre = prefix, let suf = suffix {
 
             return URL(string: "\(pre)88\(suf)")
@@ -143,7 +154,18 @@ struct Icon: Codable {
         return nil
     }
 
+    var photoUrl: URL? {
+        if let pre = prefix, let suf = suffix {
+
+            return URL(string: "\(pre)\(width ?? 500)x\(height ?? 500)\(suf)")
+        }
+        return nil
+    }
+
     enum CodingKeys: String, CodingKey {
+
+        case width
+        case height
         case prefix
         case suffix
     }

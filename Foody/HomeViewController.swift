@@ -10,10 +10,6 @@ import UIKit
 import CoreLocation
 import CoreData
 
-let client_id = "RR4Q04VMOJ0FTEHABY2BRPTBAEDERHYVUQB5XQVGTUUNODII"
-let client_secret = "N4V0SWGFY5MYEVWOHQGYB5AOOEBVOPWTTEEULM1YDFB1T0JQ"
-let foursquare_version = "20180519"
-
 class HomeViewController: UIViewController {
 
     @IBOutlet weak var tableview: UITableView! {
@@ -21,6 +17,7 @@ class HomeViewController: UIViewController {
             tableview.dataSource = self
             tableview.delegate = self
             tableview.rowHeight = UITableViewAutomaticDimension
+            tableview.isHidden = true
             if #available(iOS 10, *) {
                 tableview.refreshControl = self.refreshControl
             } else {
@@ -46,7 +43,6 @@ class HomeViewController: UIViewController {
     private var currentLocation = CLLocationCoordinate2D()
     private var dislikedVenues: [NSManagedObject] = []
     private var venues: [Venue?] = []
-//    private var venueApiOffset: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,16 +51,18 @@ class HomeViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
-        customizeNavBar()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        customizeNavBar()
         fetchDisliked()
     }
 
     private func customizeNavBar() {
+        let backButton = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backButton
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "Recommendations"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(searchButtontapped(_:)))
@@ -104,6 +102,7 @@ class HomeViewController: UIViewController {
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             request.addValue("application/json", forHTTPHeaderField: "Accept")
 
+            showLoader()
             let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
                 if error != nil {
                     print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
@@ -118,8 +117,10 @@ class HomeViewController: UIViewController {
                     }
 
                     DispatchQueue.main.async {
+                        self.tableview.isHidden = false
                         self.tableview.reloadData()
                         self.tableview.refreshControl?.endRefreshing()
+                        self.hideLoader()
                         self.checkCount(currentOffset: offset)
                     }
                     print(result as Any)
@@ -195,7 +196,10 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
+        if let id = self.venues[indexPath.row]?.id {
+            let detailsVc = DetailsViewController(venueId: id)
+            navigationController?.pushViewController(detailsVc, animated: true)
+        }
     }
 }
 
