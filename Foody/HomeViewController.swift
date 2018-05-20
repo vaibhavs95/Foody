@@ -21,9 +21,15 @@ class HomeViewController: UIViewController {
             tableview.dataSource = self
             tableview.delegate = self
             tableview.rowHeight = UITableViewAutomaticDimension
+            if #available(iOS 10, *) {
+                tableview.refreshControl = self.refreshControl
+            } else {
+                tableview.addSubview(self.refreshControl)
+            }
             tableview.register(UINib(nibName: String(describing: VenueTableViewCell.self), bundle: nil), forCellReuseIdentifier: String(describing: VenueTableViewCell.self))
         }
     }
+
     private let context: NSManagedObjectContext? = {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
 
@@ -31,7 +37,15 @@ class HomeViewController: UIViewController {
     }()
     private let locationManager = CLLocationManager()
     private var dislikedVenues: [NSManagedObject] = []
+    lazy private var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+//        control.tintColor = UIColor.defaultBlue
+        control.attributedTitle = NSAttributedString(string: "Lemme do my thang Bitch!")
+        control.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return control
+    }()
     private var venues: [Venue?] = []
+    private let offset: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,7 +60,7 @@ class HomeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        fetchDislikes()
+        fetchDisliked()
     }
 
     private func customizeNavBar() {
@@ -73,6 +87,10 @@ class HomeViewController: UIViewController {
         })
     }
 
+    @objc private func refreshData(_ sender: UIRefreshControl) {
+        sender.endRefreshing()
+    }
+
     func snapToPlace(location: CLLocationCoordinate2D) {
         let endPoint = "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=25&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)"
 
@@ -93,7 +111,6 @@ class HomeViewController: UIViewController {
                     self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
 
                     //Filter the response removing the disliked places
-//                    var dislikedVenues: [Venue?] = []
                     for disliked in self.dislikedVenues {
                         self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
                     }
@@ -130,7 +147,7 @@ class HomeViewController: UIViewController {
         saveDBState(context: managedContext)
     }
 
-    func fetchDislikes() {
+    func fetchDisliked() {
         guard let managedContext = context else { return }
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ManagedVenue")
         do {
@@ -224,7 +241,7 @@ extension HomeViewController: VenueTableViewCellDelegate {
 
         } else if let managedContext = context {
             //Remove from the database to display again if not disliked
-            fetchDislikes()
+            fetchDisliked()
             if let indexToDelete = dislikedVenues.index(where: { ($0.value(forKey: "id") as! String) == id }) {
                 managedContext.delete(dislikedVenues[indexToDelete])
                 dislikedVenues.remove(at: indexToDelete)
