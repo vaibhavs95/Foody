@@ -7,10 +7,32 @@
 //
 
 import UIKit
+import Kingfisher
 
 class DetailsViewController: UIViewController {
 
+    @IBOutlet weak var imageView: UIImageView! {
+        didSet {
+            imageView.layer.masksToBounds = true
+        }
+    }
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var ratingLabel: UILabel!
+    @IBOutlet weak var distanceLabel: UILabel!
+    @IBOutlet weak var addressLabel: UILabel!
+    @IBOutlet weak var availabilityLabel: UILabel!
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var categoryLabel: UILabel!
+    @IBOutlet weak var verifiedLabel: UILabel!
+    @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak var likesLabel: UILabel!
+    @IBOutlet weak var contactLabel: UILabel!
+    @IBOutlet weak var twitterLabel: UILabel!
+    @IBOutlet weak var instagramLabel: UILabel!
+    @IBOutlet weak var facebookLabel: UILabel!
+
     private var venueId = String()
+    private var details: VenueDetails?
 
     convenience init(venueId: String) {
         self.init()
@@ -21,12 +43,18 @@ class DetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationController?.navigationBar.prefersLargeTitles = false
         getDetails(id: venueId)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 
     private func getDetails(id: String) {
         let endPoint = "https://api.foursquare.com/v2/venues/\(id)?v=\(foursquare_version)&client_id=\(client_id)&client_secret=\(client_secret)"
+
         if let url = URL(string: endPoint) {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
@@ -41,13 +69,51 @@ class DetailsViewController: UIViewController {
                 } else {
                      let result = self.decodeResponse(data: data, type: VenueDetailResponse.self)
                     print(result as Any)
+
                     DispatchQueue.main.async {
                         self.hideLoader()
+                        self.details = result?.details
+                        self.configureView(with: result?.details)
                     }
                 }
             })
             dataTask.resume()
         }
+    }
+
+    private func configureView(with venue: VenueDetails?) {
+
+        navigationItem.title = venue?.name
+
+        imageView.kf.setImage(with: venue?.bestPhoto?.photoUrl)
+        nameLabel.text = venue?.name
+        ratingLabel.text = "  \(String(describing: venue?.rating))  "
+        ratingLabel.backgroundColor = UIColor(hexString: venue?.ratingColor ?? "000000")
+        ratingLabel.layer.cornerRadius = 3
+        addressLabel.text = venue?.location?.formattedAddress?.joined(separator: ", ")
+        let availability = venue?.hours?.isOpen ?? false
+        availabilityLabel.text = availability ? "Open now" : "Closed"
+        availabilityLabel.textColor = availability ? UIColor.defaultBlue : UIColor.red
+        statusLabel.text = " • \(venue?.hours?.status ?? "Availability not Available ;D")"
+        categoryLabel.text = venue?.cetegories?.first?.name
+
+        let optionalFields = [ (descriptionLabel, venue?.description),
+                               (distanceLabel, venue?.location?.distance),
+                               (verifiedLabel, venue?.verified),
+                               (likesLabel, venue?.likes?.likes),
+                               (contactLabel, venue?.contact?.phone),
+                               (twitterLabel, venue?.contact?.twitterHandle),
+                               (instagramLabel, venue?.contact?.instaHandle),
+                               (facebookLabel, venue?.contact?.fbHandle) ] as [(UILabel, Any?)]
+
+        for field in optionalFields {
+            if let value = field.1 as? String {
+                field.0.text = value
+            } else {
+                field.0.isHidden = true
+            }
+        }
+
     }
 
     private func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {

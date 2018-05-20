@@ -58,6 +58,30 @@ struct Contact: Codable {
     var instagram: String?
     var facebook: String?
 
+    var twitterHandle: String? {
+        if let handle = twitter {
+            return "Twitter : \(handle)"
+        }
+
+        return nil
+    }
+
+    var instaHandle: String? {
+        if let handle = instagram {
+            return "Instagram : \(handle)"
+        }
+
+        return nil
+    }
+
+    var fbHandle: String? {
+        if let handle = facebook {
+            return "Facebook : \(handle)"
+        }
+
+        return nil
+    }
+
     enum CodingKeys: String, CodingKey {
 
         case phone

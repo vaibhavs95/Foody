@@ -61,6 +61,8 @@ class HomeViewController: UIViewController {
     }
 
     private func customizeNavBar() {
+        let backButton = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backButton
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "Recommendations"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(searchButtontapped(_:)))

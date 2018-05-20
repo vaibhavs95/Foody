@@ -96,15 +96,15 @@
 				22D2184C20AF136F00D15DFB /* HomeViewController.swift */,
 				22FFD07520B1789100A2E4DF /* DetailsViewController.swift */,
 				2291402320B0B2D600AA2718 /* VenueTableViewCell.swift */,
+				2291402720B0DAC500AA2718 /* Extensions.swift */,
+				22995D6620AF6BB3008777D3 /* Data Models */,
 				22FFD07620B1789100A2E4DF /* DetailsViewController.xib */,
 				2291402420B0B2D600AA2718 /* VenueTableViewCell.xib */,
 				22D2184E20AF136F00D15DFB /* Main.storyboard */,
 				22D2185420AF136F00D15DFB /* Assets.xcassets */,
-				2291402720B0DAC500AA2718 /* Extensions.swift */,
 				22D2185620AF136F00D15DFB /* LaunchScreen.storyboard */,
 				22D2185920AF136F00D15DFB /* Info.plist */,
 				22D2185120AF136F00D15DFB /* Foody.xcdatamodeld */,
-				22995D6620AF6BB3008777D3 /* Data Models */,
 			);
 			path = Foody;
 			sourceTree = "<group>";
