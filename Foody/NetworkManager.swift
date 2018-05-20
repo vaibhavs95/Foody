@@ -22,10 +22,13 @@ enum Router {
     var endPoint: URL? {
         switch self {
         case .search(let query, let location):
-            return URL(string: "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=\(query)&limit=10&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)")
+
+            return URL(string: "https://api.foursquare.com/v2/venues/search?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&query=\(query)&radius=5000&client_id=\(client_id)&client_secret=\(client_secret)")
         case .fetchRecommended(let location, let limit):
+
             return URL(string: "https://api.foursquare.com/v2/venues/explore?ll=\(location.latitude),\(location.longitude)&v=\(foursquare_version)&intent=checkin&limit=\(limit)&radius=5000&section=food&client_id=\(client_id)&client_secret=\(client_secret)")
         case .fetchDetails(let id):
+
             return URL(string: "https://api.foursquare.com/v2/venues/\(id)?v=\(foursquare_version)&client_id=\(client_id)&client_secret=\(client_secret)")
         }
     }
@@ -37,6 +40,14 @@ enum Router {
         request.authorize()
 
         return request
+    }
+
+    func increaseLimit(by offset: Int) -> Router {
+        if case Router.fetchRecommended(let location ,let limit) = self {
+
+            return Router.fetchRecommended(location: location, limit: limit + offset)
+        }
+        return self
     }
 }
 
@@ -50,6 +61,21 @@ extension URLRequest {
 }
 
 struct NetworkManager {
+
+    static func createTask<T: Codable>(request: URLRequest, type: T.Type, completion: @escaping ((T?) -> ())) -> URLSessionDataTask {
+        let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if error != nil {
+                print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
+
+            } else {
+                let result = NetworkManager.decodeResponse(data: data, type: type)
+                print(result as Any)
+                completion(result)
+            }
+        }
+
+        return dataTask
+    }
 
     static func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
         do {

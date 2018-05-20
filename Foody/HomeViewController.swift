@@ -42,8 +42,8 @@ class HomeViewController: UIViewController {
 
     private let locationManager = CLLocationManager()
     private var currentLocation = CLLocationCoordinate2D()
-    private var dislikedVenues: [NSManagedObject] = []
     private var venues: [Venue?] = []
+    private var viewModel: HomeViewModel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,21 +52,23 @@ class HomeViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
+
+        viewModel = HomeViewModel(context: context)
+        viewModel.setup()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         customizeNavBar()
-        fetchDisliked()
     }
 
     private func customizeNavBar() {
         let backButton = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem = backButton
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(searchButtontapped(_:)))
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "Recommendations"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(searchButtontapped(_:)))
     }
 
     @objc func searchButtontapped(_ sender: UIBarButtonItem) {
@@ -88,112 +90,34 @@ class HomeViewController: UIViewController {
     }
 
     @objc private func refreshData(_ sender: UIRefreshControl) {
-        sender.endRefreshing()
+        getRecommendations(at: currentLocation)
     }
 
     func search(with query: String, at location: CLLocationCoordinate2D) {
-        if let request = Router
-                        .search(query: query, location: location)
-                        .asUrlRequest() {
-            showLoader()
+        self.showLoader()
 
-            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
-                if error != nil {
-                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
-                } else {
-                    let result = NetworkManager.decodeResponse(data: data, type: SearchResponse.self)
-                    print(result as Any)
-                    self.venues = result?.venues ?? []
-                    DispatchQueue.main.async {
-                        self.hideLoader()
-                        self.tableview.isHidden = false
-                        self.tableview.reloadData()
-                    }
-                }
-            })
-            dataTask.resume()
+        viewModel.searchVenues(router: .search(query: query, location: location)) { (venues) in
+          self.reloadView(with: venues)
         }
     }
 
-    func getRecommendations(at location: CLLocationCoordinate2D, offset: Int = 0 ) {
+    func getRecommendations(at location: CLLocationCoordinate2D, offset: Int = 0) {
         let limit = 15 + offset
 
-        if let request = Router
-                        .fetchRecommended(location: location, limit: limit)
-                        .asUrlRequest() {
-            showLoader()
-
-            let dataTask = URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) in
-                if error != nil {
-                    print("API Unsuccessful : \(String(describing: error?.localizedDescription))")
-                } else {
-                    let result = self.decodeResponse(data: data, type: RecommendedResponse.self)
-                    //Map the response to the Venue Data Type
-                    self.venues = result?.groups?.first?.items?.map { return $0.venue } ?? []
-
-                    //Filter the response removing the disliked places
-                    for disliked in self.dislikedVenues {
-                        self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
-                    }
-
-                    DispatchQueue.main.async {
-                        self.tableview.isHidden = false
-                        self.tableview.reloadData()
-                        self.hideLoader()
-                        self.checkCount(currentOffset: offset)
-                    }
-                    print(result as Any)
-                }
-            })
-            dataTask.resume()
-        }
-
-    }
-
-    private func checkCount(currentOffset: Int) {
-        if venues.count < 10 {
-            getRecommendations(at: currentLocation, offset: currentOffset + 10)
+        self.showLoader()
+        viewModel.fetchRecommended(router: .fetchRecommended(location: location, limit: limit)) { (venues) in
+            self.reloadView(with: venues)
         }
     }
 
-     private func decodeResponse<T: Codable>(data: Data?, type: T.Type, decoder: JSONDecoder = JSONDecoder()) -> T? {
-        do {
-            if let data = data {
-                let response = try decoder.decode(FoursquareResponse<T>.self, from: data)
-                return response.response
-            }
-        } catch let error {
-            print("Error while decoding -> \(error.localizedDescription)")
-        }
-        return nil
+    private func reloadView(with venues: [Venue?]) {
+        refreshControl.endRefreshing()
+        self.venues = venues
+        tableview.isHidden = false
+        tableview.reloadData()
+        hideLoader()
     }
 
-    func saveDisliked(_ id: String) {
-        guard let managedContext = context else { return }
-        let entity = NSEntityDescription.entity(forEntityName: "ManagedVenue", in: managedContext)!
-        let person = NSManagedObject(entity: entity, insertInto: managedContext)
-        person.setValue(id, forKey: "id")
-
-        saveDBState(context: managedContext)
-    }
-
-    func fetchDisliked() {
-        guard let managedContext = context else { return }
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ManagedVenue")
-        do {
-            dislikedVenues = try managedContext.fetch(fetchRequest)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
-    }
-
-    func saveDBState(context: NSManagedObjectContext) {
-        do {
-            try context.save()
-        } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
-        }
-    }
 }
 
 extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
@@ -268,23 +192,7 @@ extension HomeViewController: CLLocationManagerDelegate {
 extension HomeViewController: VenueTableViewCellDelegate {
 
     func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
-        if let index = venues.index(where: { $0?.id == id }) {
-            //Save current state in Data Models
-            venues[index]?.isDisliked = disliked
-        }
 
-        if disliked {
-            //Save in the Database
-            saveDisliked(id)
-
-        } else if let managedContext = context {
-            //Remove from the database to display again if not disliked
-            fetchDisliked()
-            if let indexToDelete = dislikedVenues.index(where: { ($0.value(forKey: "id") as! String) == id }) {
-                managedContext.delete(dislikedVenues[indexToDelete])
-                dislikedVenues.remove(at: indexToDelete)
-                saveDBState(context: managedContext)
-            }
-        }
+        viewModel.dislikeButtonTapped(disliked, at: id)
     }
 }
