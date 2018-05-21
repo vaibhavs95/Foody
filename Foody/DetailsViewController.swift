@@ -65,7 +65,7 @@ class DetailsViewController: UIViewController {
 
     @objc func getDirections() {
         let loc = mapView.annotations.first as! MapPin
-        let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking]
+        let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving]
         loc.mapItem().openInMaps(launchOptions: launchOptions)
     }
 

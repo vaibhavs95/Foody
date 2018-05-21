@@ -40,6 +40,9 @@ extension UIColor {
 extension UIViewController {
 
     func showLoader() {
+        if let existing = view.viewWithTag(100) as? UIActivityIndicatorView {
+            existing.removeFromSuperview()
+        }
         let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
         activityIndicator.frame = CGRect(origin: view.bounds.origin, size: CGSize(width: 75, height: 75))
         activityIndicator.backgroundColor = UIColor.darkGray
