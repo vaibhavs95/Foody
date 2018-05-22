@@ -14,7 +14,7 @@ class HomeViewModel: NSObject {
 
     private var context: NSManagedObjectContext?
     private var venues: [Venue?] = []
-    private var dislikedVenues: [NSManagedObject] = []
+    private var dislikedVenues: [ManagedVenue] = []
 
     convenience init(context: NSManagedObjectContext?) {
         self.init()
@@ -77,7 +77,7 @@ class HomeViewModel: NSObject {
         } else if let managedContext = context {
             //Remove from the database to display again if not disliked
             dislikedVenues = fetchDisliked()
-            if let indexToDelete = dislikedVenues.index(where: { ($0.value(forKey: "id") as! String) == id }) {
+            if let indexToDelete = dislikedVenues.index(where: { ($0.id) == id }) {
                 managedContext.delete(dislikedVenues[indexToDelete])
                 dislikedVenues.remove(at: indexToDelete)
                 saveDBState(context: managedContext)
@@ -97,9 +97,9 @@ class HomeViewModel: NSObject {
         saveDBState(context: managedContext)
     }
 
-    func fetchDisliked() -> [NSManagedObject] {
+    func fetchDisliked() -> [ManagedVenue] {
          guard let managedContext = context else { return [] }
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "ManagedVenue")
+        let fetchRequest = NSFetchRequest<ManagedVenue>(entityName: "ManagedVenue")
         do {
             let dislikedVenues = try managedContext.fetch(fetchRequest)
 
