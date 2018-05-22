@@ -64,7 +64,7 @@ class HomeViewModel: NSObject {
         }
     }
 
-    func dislikeButtonTapped(_ disliked: Bool, at id: String) {
+    func updateDislikesInData(_ disliked: Bool, at id: String) -> [Venue?] {
         if let index = venues.index(where: { $0?.id == id }) {
             //Save current state in Data Models
             venues[index]?.isDisliked = disliked
@@ -83,6 +83,8 @@ class HomeViewModel: NSObject {
                 saveDBState(context: managedContext)
             }
         }
+
+        return venues
     }
 
     //Mark :- CoreData methods
@@ -117,5 +119,3 @@ class HomeViewModel: NSObject {
         }
     }
 }
-
-

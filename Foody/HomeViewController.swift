@@ -193,6 +193,6 @@ extension HomeViewController: VenueTableViewCellDelegate {
 
     func cellDislikeButtonTapped(disliked: Bool, itemWith id: String) {
 
-        viewModel.dislikeButtonTapped(disliked, at: id)
+        self.venues = viewModel.updateDislikesInData(disliked, at: id)
     }
 }

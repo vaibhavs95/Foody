@@ -9,7 +9,7 @@
 import UIKit
 import Kingfisher
 
-protocol VenueTableViewCellDelegate: class {
+protocol VenueTableViewCellDelegate: AnyObject {
     func cellDislikeButtonTapped(disliked: Bool, itemWith id: String)
 }
 
