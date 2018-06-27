@@ -26,7 +26,7 @@ class HomeViewModel: NSObject {
         dislikedVenues = fetchDisliked()
     }
 
-    func fetchRecommended(router: Router, completion: @escaping (([Venue?]) -> ())) {
+    func fetchRecommended(router: Router, completion: @escaping (([Venue?]) -> ()), retries: Int = 0) {
 
         if let request = router.asUrlRequest() {
             let dataTask = NetworkManager.createTask(request: request, type: RecommendedResponse.self, completion: { (response) in
@@ -41,9 +41,9 @@ class HomeViewModel: NSObject {
                     DispatchQueue.main.async {
                         completion(self.venues)
                     }
-                } else {
+                } else if retries < 3 {
                     //Make another API call with more limit if objects are less than 10
-                    self.fetchRecommended(router: router.increaseLimit(by: 10), completion: completion)
+                    self.fetchRecommended(router: router.increaseLimit(by: 10), completion: completion, retries: retries + 1)
                 }
 
             })
