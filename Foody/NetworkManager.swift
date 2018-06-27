@@ -43,8 +43,8 @@ enum Router {
     }
 
     func increaseLimit(by offset: Int) -> Router {
-        if case Router.fetchRecommended(let location ,let limit) = self {
 
+        if case Router.fetchRecommended(let location ,let limit) = self {
             return Router.fetchRecommended(location: location, limit: limit + offset)
         }
         return self
@@ -63,6 +63,7 @@ extension URLRequest {
 struct NetworkManager {
 
     static func createTask<T: Codable>(request: URLRequest, type: T.Type, completion: @escaping ((T?) -> ())) -> URLSessionDataTask {
+
         let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if error != nil {
                 print("API Unsuccessful : \(String(describing: error?.localizedDescription))")

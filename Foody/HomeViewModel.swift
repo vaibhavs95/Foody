@@ -26,24 +26,43 @@ class HomeViewModel: NSObject {
         dislikedVenues = fetchDisliked()
     }
 
-    func fetchRecommended(router: Router, completion: @escaping (([Venue?]) -> ()), retries: Int = 0) {
+    func numberOfRowsInSection(section: Int) -> Int {
+        switch section {
+        case 0:
+            return venues.count < 10 ? venues.count : 10
+        default:
+            return 0
+        }
+    }
+
+    func getItemForCell(at indexpath: IndexPath) -> Venue? {
+        switch indexpath.section {
+        case 0:
+            return venues[indexpath.row]
+        default:
+            return nil
+        }
+    }
+
+    func fetchRecommended(router: Router, retries: Int = 0, completion: @escaping (([Venue?]) -> ())) {
 
         if let request = router.asUrlRequest() {
             let dataTask = NetworkManager.createTask(request: request, type: RecommendedResponse.self, completion: { (response) in
+
                 self.venues = response?.groups?.first?.items?.map { return $0.venue } ?? []
 
                 //Filter the response removing the disliked places
                 for disliked in self.dislikedVenues {
                     self.venues = self.venues.filter { $0?.id != (disliked.value(forKey: "id") as! String) }
                 }
-
                 if self.venues.count > 10 {
                     DispatchQueue.main.async {
                         completion(self.venues)
                     }
+
+                //Make another API call with more limit if objects are less than 10
                 } else if retries < 3 {
-                    //Make another API call with more limit if objects are less than 10
-                    self.fetchRecommended(router: router.increaseLimit(by: 10), completion: completion, retries: retries + 1)
+                    self.fetchRecommended(router: router.increaseLimit(by: 10), retries: retries + 1, completion: completion)
                 }
 
             })
@@ -64,18 +83,20 @@ class HomeViewModel: NSObject {
         }
     }
 
-    func updateDislikesInData(_ disliked: Bool, at id: String) -> [Venue?] {
+    func updateDislikesInData(_ disliked: Bool, at id: String) {
+
+        //Save current state in Data Models
         if let index = venues.index(where: { $0?.id == id }) {
-            //Save current state in Data Models
             venues[index]?.isDisliked = disliked
         }
 
+        //Update the Database
         if disliked {
-            //Save in the Database
             saveDisliked(id)
             self.dislikedVenues = fetchDisliked()
+
+        //Remove from the database to display again if user undoes the dislike
         } else if let managedContext = context {
-            //Remove from the database to display again if not disliked
             dislikedVenues = fetchDisliked()
             if let indexToDelete = dislikedVenues.index(where: { ($0.id) == id }) {
                 managedContext.delete(dislikedVenues[indexToDelete])
@@ -83,11 +104,12 @@ class HomeViewModel: NSObject {
                 saveDBState(context: managedContext)
             }
         }
-
-        return venues
     }
+}
 
-    //Mark :- CoreData methods
+//Mark :- CoreData methods
+private extension HomeViewModel {
+
     func saveDisliked(_ id: String) {
          guard let managedContext = context else { return }
         let entity = NSEntityDescription.entity(forEntityName: "ManagedVenue", in: managedContext)!
