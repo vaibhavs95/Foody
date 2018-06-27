@@ -39,7 +39,6 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var facebookLabel: UILabel!
 
     private var venueId = String()
-    private var details: VenueDetails?
     private var viewModel: DetailViewModel!
 
     convenience init(venueId: String) {
@@ -58,9 +57,21 @@ class DetailsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        scrollView.isHidden = true
         navigationController?.navigationBar.prefersLargeTitles = false
-        let directionsBarButton = UIBarButtonItem(title: "Get Directions", style: .plain, target: self, action: #selector(getDirections))
-        navigationItem.rightBarButtonItem = directionsBarButton
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Get Directions", style: .plain, target: self, action: #selector(getDirections))
+    }
+
+    private func setup(id: String) {
+        showLoader()
+
+        viewModel.fetchDetails(router: .fetchDetails(id: id)) { (details) in
+            DispatchQueue.main.async {
+                self.scrollView.isHidden = false
+                self.hideLoader()
+                self.configureView(with: details)
+            }
+        }
     }
 
     @objc func getDirections() {
@@ -69,19 +80,7 @@ class DetailsViewController: UIViewController {
         loc.mapItem().openInMaps(launchOptions: launchOptions)
     }
 
-    private func setup(id: String) {
-        showLoader()
-        viewModel.fetchDetails(router: .fetchDetails(id: id)) { (details) in
-            DispatchQueue.main.async {
-                self.hideLoader()
-                self.details = details
-                self.configureView(with: details)
-                self.configureMaps()
-            }
-        }
-    }
-
-    private func configureMaps() {
+    private func configureMaps(with details: VenueDetails?) {
         guard let lattitude = details?.location?.lattitude, let longitude = details?.location?.longitude else { return }
 
         let location = CLLocationCoordinate2D(latitude: lattitude, longitude: longitude)
@@ -92,8 +91,8 @@ class DetailsViewController: UIViewController {
 
     private func configureView(with venue: VenueDetails?) {
 
+        configureMaps(with: venue)
         title = venue?.name
-
         nameLabel.text = venue?.name
         ratingLabel.text = "  \(venue?.rating ?? 0.0)  "
         ratingLabel.backgroundColor = UIColor(hexString: venue?.ratingColor ?? "000000") ?? UIColor.black
