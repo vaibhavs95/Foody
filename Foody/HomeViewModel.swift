@@ -16,8 +16,8 @@ class HomeViewModel: NSObject {
     private var venues: [Venue?] = []
     private var dislikedVenues: [ManagedVenue] = []
 
-    convenience init(context: NSManagedObjectContext?) {
-        self.init()
+    init(context: NSManagedObjectContext?) {
+        super.init()
 
         self.context = context
     }

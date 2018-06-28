@@ -12,8 +12,8 @@ class DetailViewModel: NSObject {
 
     private var venueId: String!
 
-    convenience init(id: String) {
-        self.init()
+    init(id: String) {
+        super.init()
 
         self.venueId = id
     }
